@@ -1,0 +1,17 @@
+{
+	"extends": ["plugin:@wordpress/eslint-plugin/recommended"],
+	"ignorePatterns": ["webpack.config.js", "dist/*"],
+	"globals": {
+		"wpsmSettings": true
+	},
+	"rules": {
+		"prettier/prettier": [
+			"error",
+			{
+				"semi": true,
+				"singleQuote": true,
+				"trailingComma": "es5"
+			}
+		]
+	}
+}

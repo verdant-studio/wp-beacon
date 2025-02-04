@@ -1,0 +1,13 @@
+@import 'tailwindcss' source('../../src') prefix('wpbcn');
+
+.settings_page_wp-beacon #wpcontent {
+	padding-left: 0;
+}
+
+*,
+::before,
+::after {
+	border-width: 0;
+	border-style: solid;
+	border-color: theme('borderColor.DEFAULT', currentColor);
+}
