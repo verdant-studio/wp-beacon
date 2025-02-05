@@ -80,22 +80,22 @@ export function Settings({ wpObject }) {
 	}, []);
 
 	return (
-		<div className="flybe-flex flybe-flex-col flybe-space-y-4">
-			<div className="flybe-bg-white flybe-rounded flybe-shadow flybe-max-w-screen-lg">
-				<div className="flybe-border-b flybe-p-4">
-					<h2 className="flybe-inline-block flybe-m-0">
+		<div className="wpbcn:flex wpbcn:flex-col wpbcn:space-y-4">
+			<div className="wpbcn:bg-white wpbcn:rounded wpbcn:shadow wpbcn:max-w-screen-lg">
+				<div className="wpbcn:border-b! wpbcn:border-slate-200! wpbcn:p-4">
+					<h2 className="wpbcn:inline-block wpbcn:m-0">
 						{__('General Settings', 'flying-beacon')}
 					</h2>
 				</div>
-				<div className="flybe-p-4 flybe-flex flybe-flex-col flybe-space-y-4">
+				<div className="wpbcn:p-4 wpbcn:flex wpbcn:flex-col wpbcn:space-y-4">
 
-					<div className="flybe-gap-2 flybe-grid md:flybe-grid-cols-4">
-						<div className="flybe-flex flybe-items-center flybe-text-left flybe-font-semibold">
+					<div className="wpbcn:gap-2 wpbcn:grid md:wpbcn:grid-cols-4">
+						<div className="wpbcn:flex wpbcn:items-center wpbcn:text-left wpbcn:font-semibold">
 							{__('Service', 'flying-beacon')}
 						</div>
-						<div className="flybe-col-span-3">
+						<div className="wpbcn:col-span-3">
 							<select
-								className="flybe-w-full"
+								className="wpbcn:w-full"
 								onChange={(e) =>
 									setSettings({
 										...settings,
@@ -111,13 +111,13 @@ export function Settings({ wpObject }) {
 						</div>
 					</div>
 
-					<div className="flybe-gap-2 flybe-grid md:flybe-grid-cols-4">
-						<div className="flybe-flex flybe-items-center flybe-text-left flybe-font-semibold">
+					<div className="wpbcn:gap-2 wpbcn:grid md:wpbcn:grid-cols-4">
+						<div className="wpbcn:flex wpbcn:items-center wpbcn:text-left wpbcn:font-semibold">
 							{__('Interval', 'flying-beacon')}
 						</div>
-						<div className="flybe-col-span-3">
+						<div className="wpbcn:col-span-3">
 							<select
-								className="flybe-w-full"
+								className="wpbcn:w-full"
 								onChange={(e) =>
 									setSettings({
 										...settings,
@@ -149,7 +149,7 @@ export function Settings({ wpObject }) {
 					}
 				/>
 			)}
-			<div className="!flybe-mt-6">
+			<div className="!wpbcn:mt-6">
 				<Button
 					loading={saving}
 					onClick={updateSettings}

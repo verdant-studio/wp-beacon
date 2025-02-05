@@ -7,13 +7,13 @@ import { __, sprintf } from '@wordpress/i18n';
 export function Button({ children, loading, onClick }) {
 	return (
 		<button
-			className="flybe-bg-black flybe-cursor-pointer flybe-flex flybe-px-3 flybe-py-2.5 flybe-rounded flybe-space-x-1 flybe-text-sm flybe-text-white hover:flybe-bg-neutral-800"
+			className="wpbcn:bg-black wpbcn:cursor-pointer wpbcn:flex wpbcn:px-3 wpbcn:py-2.5 wpbcn:rounded wpbcn:space-x-1 wpbcn:text-sm wpbcn:text-white hover:wpbcn:bg-neutral-800"
 			onClick={onClick}
 		>
 			{loading && (
 				<svg
 					aria-hidden="true"
-					className="flybe-animate-spin flybe-fill-cyan-400 flybe-h-5 flybe-text-white flybe-w-5"
+					className="wpbcn:animate-spin wpbcn:fill-cyan-400 wpbcn:h-5 wpbcn:text-white wpbcn:w-5"
 					fill="none"
 					viewBox="0 0 100 101"
 					xmlns="http://www.w3.org/2000/svg"

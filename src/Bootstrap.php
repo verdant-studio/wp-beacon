@@ -16,6 +16,7 @@ if ( ! defined( 'ABSPATH' )) {
 	exit;
 }
 
+use WPBeacon\Providers\ApiServiceProvider;
 use WPBeacon\Providers\AssetsServiceProvider;
 use WPBeacon\Providers\SettingsServiceProvider;
 use WPBeacon\Vendor_Prefixed\DI\ContainerBuilder;
@@ -66,6 +67,7 @@ final class Bootstrap
 	protected function get_providers(): array
 	{
 		$providers = array(
+			ApiServiceProvider::class,
 			AssetsServiceProvider::class,
 			SettingsServiceProvider::class,
 		);

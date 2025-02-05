@@ -1,4 +1,7 @@
-@import 'tailwindcss' source('../../src') prefix('wpbcn');
+@layer theme, base, components, utilities;
+
+@import 'tailwindcss/theme.css' layer(theme) prefix(wpbcn);
+@import 'tailwindcss/utilities.css' layer(utilities) prefix(wpbcn);
 
 .settings_page_wp-beacon #wpcontent {
 	padding-left: 0;
@@ -9,5 +12,5 @@
 ::after {
 	border-width: 0;
 	border-style: solid;
-	border-color: theme('borderColor.DEFAULT', currentColor);
+	border-color: var(--color-slate-500);
 }

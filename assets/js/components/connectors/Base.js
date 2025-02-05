@@ -6,13 +6,13 @@ import React from 'react';
 export function Base({ children, title }) {
 	return (
 		<div>
-			<div className="flybe-bg-white flybe-rounded flybe-shadow flybe-max-w-screen-lg">
-				<div className="flybe-border-b flybe-p-4">
-					<h2 className="flybe-inline-block flybe-m-0">
+			<div className="wpbcn:bg-white wpbcn:rounded wpbcn:shadow wpbcn:max-w-screen-lg">
+				<div className="wpbcn:border-b! wpbcn:border-slate-200! wpbcn:p-4">
+					<h2 className="wpbcn:inline-block wpbcn:m-0">
 						{title}
 					</h2>
 				</div>
-				<div className="flybe-p-4 flybe-flex flybe-flex-col flybe-space-y-4">
+				<div className="wpbcn:p-4 wpbcn:flex wpbcn:flex-col wpbcn:space-y-4">
 					{children}
 				</div>
 			</div>

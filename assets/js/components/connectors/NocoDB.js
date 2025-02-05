@@ -33,14 +33,14 @@ export function NocoDB({ data, update }) {
 	};
 
 	return (
-		<Base title={__('NocoDB Settings', 'flying-beacon')}>
-			<div className="flybe-gap-2 flybe-grid md:flybe-grid-cols-4">
-				<div className="flybe-flex flybe-items-center flybe-text-left flybe-font-semibold">
-					{__('URL', 'flying-beacon')}
+		<Base title={__('NocoDB Settings', 'wp-beacon')}>
+			<div className="wpbcn:gap-2 wpbcn:grid md:wpbcn:grid-cols-4">
+				<div className="wpbcn:flex wpbcn:items-center wpbcn:text-left wpbcn:font-semibold">
+					{__('URL', 'wp-beacon')}
 				</div>
-				<div className="flybe-col-span-3">
+				<div className="wpbcn:col-span-3">
 					<input
-						className="flybe-w-full"
+						className="wpbcn:w-full"
 						name="url"
 						onChange={(e) => handleChange('url', e.target.value)}
 						placeholder="e.g. https://app.nocodb.com/api/v2/tables"
@@ -50,13 +50,13 @@ export function NocoDB({ data, update }) {
 				</div>
 			</div>
 
-			<div className="flybe-gap-2 flybe-grid md:flybe-grid-cols-4">
-				<div className="flybe-flex flybe-items-center flybe-text-left flybe-font-semibold">
-					{__('Table ID', 'flying-beacon')}
+			<div className="wpbcn:gap-2 wpbcn:grid md:wpbcn:grid-cols-4">
+				<div className="wpbcn:flex wpbcn:items-center wpbcn:text-left wpbcn:font-semibold">
+					{__('Table ID', 'wp-beacon')}
 				</div>
-				<div className="flybe-col-span-3">
+				<div className="wpbcn:col-span-3">
 					<input
-						className="flybe-w-full"
+						className="wpbcn:w-full"
 						name="table_id"
 						onChange={(e) => handleChange('table_id', e.target.value)}
 						type="text"
@@ -65,13 +65,13 @@ export function NocoDB({ data, update }) {
 				</div>
 			</div>
 
-			<div className="flybe-gap-2 flybe-grid md:flybe-grid-cols-4">
-				<div className="flybe-flex flybe-items-center flybe-text-left flybe-font-semibold">
-					{__('XC token', 'flying-beacon')}
+			<div className="wpbcn:gap-2 wpbcn:grid md:wpbcn:grid-cols-4">
+				<div className="wpbcn:flex wpbcn:items-center wpbcn:text-left wpbcn:font-semibold">
+					{__('XC token', 'wp-beacon')}
 				</div>
-				<div className="flybe-col-span-3">
+				<div className="wpbcn:col-span-3">
 					<input
-						className="flybe-w-full"
+						className="wpbcn:w-full"
 						name="xc_token"
 						onChange={(e) => handleChange('xc_token', e.target.value)}
 						type="text"
