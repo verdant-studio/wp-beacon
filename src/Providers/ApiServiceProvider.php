@@ -41,7 +41,7 @@ class ApiServiceProvider extends ServiceProvider
 	}
 
 	/**
-	 * Register the Api actions.
+	 * Register actions.
 	 *
 	 * @since 1.0.0
 	 */

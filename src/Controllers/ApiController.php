@@ -16,6 +16,8 @@ if ( ! defined( 'ABSPATH' )) {
 	exit;
 }
 
+use WPBeacon\Services\EventService;
+
 /**
  * API controller.
  *
@@ -59,6 +61,8 @@ class ApiController
 		);
 
 		update_option( 'wp_beacon_settings', $settings );
+
+		EventService::reschedule( $interval );
 
 		return new \WP_REST_Response(
 			array(
