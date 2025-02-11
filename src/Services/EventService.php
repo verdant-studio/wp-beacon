@@ -16,6 +16,8 @@ if ( ! defined( 'ABSPATH' )) {
 	exit;
 }
 
+use WPBeacon\Providers\SettingsServiceProvider;
+
 /**
  * Register wp_schedule_event service.
  *
@@ -28,48 +30,109 @@ class EventService extends Service
 	 *
 	 * @since 1.0.0
 	 */
-	const PUSH_EVENT = 'wp_beacon_push_event';
+	const CRON_BEACON_PUSH_EVENT = 'wp_beacon_push_event';
+
+	/**
+	 * Register hooks.
+	 */
+	public function register(): void
+	{
+		// Register WP-Cron hooks.
+		$this->register_cron_hooks();
+	}
+
+	/**
+	 * Register WP-Cron hooks.
+	 *
+	 * @since 1.0.0
+	 */
+	private function register_cron_hooks(): void
+	{
+		$this->register_single_cron_hook();
+	}
+
+	/**
+	 * Register a single cron hook to trigger an event.
+	 *
+	 * @since 1.0.0
+	 */
+	private function register_single_cron_hook(): void
+	{
+		add_action( self::CRON_BEACON_PUSH_EVENT, fn() => do_action( 'yfw_import_themes', 1 ) );
+	}
 
 	/**
 	 * Schedule a new wp event unless it already exists.
 	 *
 	 * @since 1.0.0
-	 *
-	 * @param string $interval | hourly, twicedaily, daily, weekly
 	 */
-	public static function schedule( string $interval, string $event_name = null ): void
+	public static function schedule( $schedule, $recurrence ): void
 	{
-		$args = $event_name ? array( $event_name ) : array();
+		$schedules = SettingsServiceProvider::get_cron_schedules();
 
-		if ( ! wp_next_scheduled( self::PUSH_EVENT, $args )) {
-			wp_schedule_event( time(), $interval, self::PUSH_EVENT, $args );
+		// Ensure the recurrence is valid.
+		if ( ! isset( $schedules[ $recurrence ] ) ) {
+			$recurrence = SettingsServiceProvider::DEFAULT_CRON_SCHEDULE;
+		}
+
+		self::maybe_schedule_event( $schedule, $recurrence );
+	}
+
+	/**
+	 * Reschedule events.
+	 *
+	 * @since 1.0.0
+	 */
+	public static function reschedule(string $hook, string $recurrence ): void
+	{
+		self::unschedule( $hook );
+		self::schedule( $hook, $recurrence );
+	}
+
+	/**
+	 * Conditionally schedule a WordPress event if the setting is enabled.
+	 */
+	private static function maybe_schedule_event( string $hook, string $recurrence ): void
+	{
+		$settings = get_option( 'wp_beacon_settings' );
+
+		if ( self::is_enabled( $settings ) ) {
+			self::schedule_event_if_not_exists( $hook, $recurrence );
 		}
 	}
 
 	/**
-	 * Reschedule event when the settings have changed.
+	 * Check if a setting is enabled.
 	 *
 	 * @since 1.0.0
-	 *
-	 * @param string $interval | hourly, twicedaily, daily, weekly
 	 */
-	public static function reschedule( string $interval, string $event_name = null ): void
+	private static function is_enabled( ?array $settings ): bool
 	{
-		self::unschedule( $event_name );
-		self::schedule( $interval, $event_name );
+		return isset( $settings );
 	}
 
+	/**
+	 * Schedule a WordPress event if it's not already scheduled.
+	 *
+	 * @since 1.0.0
+	 */
+	private static function schedule_event_if_not_exists( string $hook, string $recurrence ): void
+	{
+		if ( ! wp_next_scheduled( $hook ) ) {
+			wp_schedule_event( time(), $recurrence, $hook );
+		}
+	}
 	/**
 	 * Clear scheduled wp event.
 	 *
 	 * @since 1.0.0
 	 */
-	public static function unschedule( string $event_name = null ): void
+	public static function unschedule( string $hook ): void
 	{
-		$args = $event_name ? array( $event_name ) : array();
+		$timestamp = wp_next_scheduled( $hook );
 
-		if ( wp_next_scheduled( self::PUSH_EVENT, $args ) ) {
-			wp_clear_scheduled_hook( self::PUSH_EVENT, $args );
+		if ( $timestamp ) {
+			wp_unschedule_event( $timestamp, $hook );
 		}
 	}
 }

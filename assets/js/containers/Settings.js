@@ -2,7 +2,7 @@
  * External dependencies.
  */
 import React, { useEffect, useState } from 'react';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies.
@@ -12,35 +12,15 @@ import { FetchWP } from '../utils/FetchWP';
 import { Airtable } from '../components/connectors/Airtable';
 import { NocoDB } from '../components/connectors/NocoDB';
 
-const intervalOptions = [
-	{
-		label: __('Choose an interval', 'flying-beacon'),
-		value: '',
-	},
-	{
-		label: __('Hourly', 'flying-beacon'),
-		value: 'hourly',
-	},
-	{
-		label: __('Twice daily', 'flying-beacon'),
-		value: 'twicedaily',
-	},
-	{
-		label: __('Daily', 'flying-beacon'),
-		value: 'daily',
-	},
-	{
-		label: __('Weekly', 'flying-beacon'),
-		value: 'weekly',
-	},
-];
-
 export function Settings({ wpObject }) {
+	const DEFAULT_SCHEDULE = 'wp_beacon_12_hour';
+
 	const [error, setError] = useState(null);
 	const [saving, setSaving] = useState(false);
+	const [schedules, setSchedules] = useState([]);
 	const [settings, setSettings] = useState({
+		schedule: '',
 		service: '',
-		interval: '',
 		service_settings: [],
 	});
 
@@ -54,10 +34,11 @@ export function Settings({ wpObject }) {
 	const getSettings = () => {
 		return fetch.get('/settings').then((json) => {
 			setSettings({
-				service: json.value.service,
-				interval: json.value.interval,
+				schedule: json.value.settings.schedule,
+				service: json.value.settings.service,
 				service_settings: json.value.service_settings,
 			});
+			setSchedules(json.value.schedules);
 		});
 	};
 
@@ -84,14 +65,14 @@ export function Settings({ wpObject }) {
 			<div className="wpbcn:bg-white wpbcn:rounded wpbcn:shadow wpbcn:max-w-screen-lg">
 				<div className="wpbcn:border-b! wpbcn:border-slate-200! wpbcn:p-4">
 					<h2 className="wpbcn:inline-block wpbcn:m-0">
-						{__('General Settings', 'flying-beacon')}
+						{__('General Settings', 'wp-beacon')}
 					</h2>
 				</div>
 				<div className="wpbcn:p-4 wpbcn:flex wpbcn:flex-col wpbcn:space-y-4">
 
 					<div className="wpbcn:gap-2 wpbcn:grid md:wpbcn:grid-cols-4">
 						<div className="wpbcn:flex wpbcn:items-center wpbcn:text-left wpbcn:font-semibold">
-							{__('Service', 'flying-beacon')}
+							{__('Service', 'wp-beacon')}
 						</div>
 						<div className="wpbcn:col-span-3">
 							<select
@@ -104,7 +85,7 @@ export function Settings({ wpObject }) {
 								}
 								value={settings.service}
 							>
-								<option value="">{__('Choose a service', 'flying-beacon')}</option>
+								<option value="">{__('Choose a service', 'wp-beacon')}</option>
 								<option value="airtable">Airtable</option>
 								<option value="nocodb">NocoDB</option>
 							</select>
@@ -113,7 +94,7 @@ export function Settings({ wpObject }) {
 
 					<div className="wpbcn:gap-2 wpbcn:grid md:wpbcn:grid-cols-4">
 						<div className="wpbcn:flex wpbcn:items-center wpbcn:text-left wpbcn:font-semibold">
-							{__('Interval', 'flying-beacon')}
+							{__('Schedule', 'wp-beacon')}
 						</div>
 						<div className="wpbcn:col-span-3">
 							<select
@@ -121,14 +102,14 @@ export function Settings({ wpObject }) {
 								onChange={(e) =>
 									setSettings({
 										...settings,
-										interval: e.target.value,
+										schedule: e.target.value,
 									})
 								}
-								value={settings.interval}
+								value={settings.schedule || DEFAULT_SCHEDULE}
 							>
-								{intervalOptions.map((option, index) => (
-									<option key={index} value={option.value}>
-										{option.label}
+								{Object.entries(schedules).map(([key, value]) => (
+									<option key={key} value={key}>
+										{value}
 									</option>
 								))}
 							</select>
@@ -154,7 +135,7 @@ export function Settings({ wpObject }) {
 					loading={saving}
 					onClick={updateSettings}
 				>
-					{__('Save Changes', 'flying-beacon')}
+					{__('Save Changes', 'wp-beacon')}
 				</Button>
 			</div>
 		</div>
