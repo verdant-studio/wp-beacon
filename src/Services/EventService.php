@@ -52,13 +52,23 @@ class EventService extends Service
 	}
 
 	/**
+	 * Trigger a sync event.
+	 *
+	 * @since 1.0.0
+	 */
+	public static function trigger_sync(): void
+	{
+		do_action( 'wp_beacon_trigger_sync', 1 );
+	}
+
+	/**
 	 * Register a single cron hook to trigger an event.
 	 *
 	 * @since 1.0.0
 	 */
 	private function register_single_cron_hook(): void
 	{
-		add_action( self::CRON_BEACON_PUSH_EVENT, fn() => do_action( 'yfw_import_themes', 1 ) );
+		add_action( self::CRON_BEACON_PUSH_EVENT, array( self::class, 'trigger_sync' ) );
 	}
 
 	/**

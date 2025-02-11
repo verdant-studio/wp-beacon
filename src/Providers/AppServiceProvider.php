@@ -17,6 +17,7 @@ if ( ! defined( 'ABSPATH' )) {
 }
 
 use WPBeacon\Services\EventService;
+use WPBeacon\Services\LifeCycleService;
 
 /**
  * App service provider (registers general plugins functionality).
@@ -26,10 +27,12 @@ use WPBeacon\Services\EventService;
 class AppServiceProvider extends ServiceProvider
 {
 	public function __construct(
-		EventService $event_service
+		EventService $event_service,
+		LifeCycleService $life_cycle_service
 	) {
 		$this->services = array(
-			'event'      => $event_service
+			'event'      => $event_service,
+			'life_cycle' => $life_cycle_service,
 		);
 	}
 }

@@ -32,7 +32,7 @@ class ApiController
 	 */
 	public static function get_settings(): \WP_REST_Response
 	{
-		$settings = get_option( 'wp_beacon_settings' );
+		$settings  = get_option( 'wp_beacon_settings' );
 		$schedules = wp_get_schedules();
 
 		// Show only the schedules defined for this plugin.
@@ -53,10 +53,10 @@ class ApiController
 		return new \WP_REST_Response(
 			array(
 				'success' => true,
-				'value'   => [
+				'value'   => array(
 					'schedules' => $schedules,
-					'settings' => $settings,
-				],
+					'settings'  => $settings,
+				),
 			),
 			200
 		);
