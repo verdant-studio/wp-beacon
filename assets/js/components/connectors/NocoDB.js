@@ -18,6 +18,7 @@ export function NocoDB({ data, update }) {
 
 	// Set database data at render.
 	useEffect(() => {
+		console.log(data);
 		setSettings({
 			url: data?.url ?? '',
 			table_id: data?.table_id ?? '',
@@ -31,6 +32,8 @@ export function NocoDB({ data, update }) {
 		setSettings(updatedSettings);
 		update(updatedSettings);
 	};
+
+	console.log(settings);
 
 	return (
 		<Base title={__('NocoDB Settings', 'wp-beacon')}>

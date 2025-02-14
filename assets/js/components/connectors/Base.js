@@ -8,7 +8,7 @@ export function Base({ children, title }) {
 		<div>
 			<div className="wpbcn:bg-white wpbcn:rounded wpbcn:shadow wpbcn:max-w-screen-lg">
 				<div className="wpbcn:border-b! wpbcn:border-slate-200! wpbcn:p-4">
-					<h2 className="wpbcn:inline-block wpbcn:m-0">
+					<h2 className="wpbcn:font-semibold wpbcn:inline-block wpbcn:m-0! wpbcn:text-lg!">
 						{title}
 					</h2>
 				</div>

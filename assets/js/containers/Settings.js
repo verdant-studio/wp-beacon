@@ -36,7 +36,7 @@ export function Settings({ wpObject }) {
 			setSettings({
 				schedule: json.value.settings.schedule,
 				service: json.value.settings.service,
-				service_settings: json.value.service_settings,
+				service_settings: json.value.settings.service_settings,
 			});
 			setSchedules(json.value.schedules);
 		});
@@ -64,7 +64,7 @@ export function Settings({ wpObject }) {
 		<div className="wpbcn:flex wpbcn:flex-col wpbcn:space-y-4">
 			<div className="wpbcn:bg-white wpbcn:rounded wpbcn:shadow wpbcn:max-w-screen-lg">
 				<div className="wpbcn:border-b! wpbcn:border-slate-200! wpbcn:p-4">
-					<h2 className="wpbcn:inline-block wpbcn:m-0">
+					<h2 className="wpbcn:font-semibold wpbcn:inline-block wpbcn:m-0! wpbcn:text-lg!">
 						{__('General Settings', 'wp-beacon')}
 					</h2>
 				</div>

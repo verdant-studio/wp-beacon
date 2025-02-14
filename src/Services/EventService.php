@@ -17,6 +17,8 @@ if ( ! defined( 'ABSPATH' )) {
 }
 
 use WPBeacon\Providers\SettingsServiceProvider;
+use WPBeacon\Services\Integrations\AirtableService;
+use WPBeacon\Services\Integrations\NocoDBService;
 
 /**
  * Register wp_schedule_event service.
@@ -25,6 +27,13 @@ use WPBeacon\Providers\SettingsServiceProvider;
  */
 class EventService extends Service
 {
+	private NocoDBService $noco_db_service;
+
+	public function __construct(NocoDBService $noco_db_service )
+	{
+		$this->noco_db_service = $noco_db_service;
+	}
+
 	/**
 	 * The name of the push event.
 	 *
@@ -56,9 +65,22 @@ class EventService extends Service
 	 *
 	 * @since 1.0.0
 	 */
-	public static function trigger_sync(): void
+	public function trigger_sync(): void
 	{
-		do_action( 'wp_beacon_trigger_sync', 1 );
+		$settings = get_option( 'wp_beacon_settings' );
+
+		if ($settings && isset( $settings['service'] )) {
+			switch ($settings['service']) {
+				case 'airtable':
+					AirtableService::sync();
+					break;
+				case 'nocodb':
+					$this->noco_db_service->sync();
+					break;
+				default:
+					break;
+			}
+		}
 	}
 
 	/**
@@ -68,7 +90,7 @@ class EventService extends Service
 	 */
 	private function register_single_cron_hook(): void
 	{
-		add_action( self::CRON_BEACON_PUSH_EVENT, array( self::class, 'trigger_sync' ) );
+		add_action( self::CRON_BEACON_PUSH_EVENT, array( $this, 'trigger_sync' ) );
 	}
 
 	/**

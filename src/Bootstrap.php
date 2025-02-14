@@ -37,7 +37,7 @@ final class Bootstrap
 	 *
 	 * @var ContainerInterface
 	 */
-	private static ContainerInterface $container;
+	private ContainerInterface $container;
 
 	/**
 	 * Dependency providers.
