@@ -13,6 +13,7 @@
  * Text Domain: wp-beacon
  * Domain Path: /languages
  * Requires at least: 6.0
+ * Network: true
  */
 
 /**
