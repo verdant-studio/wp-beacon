@@ -87,6 +87,7 @@ class NocoDBService
 						'Health'            => $this->get_site_health_rating(),
 						'WP Version'        => $this->get_current_wp_version(),
 						'Updates available' => $this->get_amount_of_plugin_updates(),
+						'Last sync'         => date( 'Y-m-d H:i:s' ),
 					)
 				),
 			)
@@ -143,7 +144,8 @@ class NocoDBService
 						'URL'               => $this->get_site_url(),
 						'Health'            => $this->get_site_health_rating(),
 						'WP Version'        => $this->get_current_wp_version(),
-						'Updates available' => 2,
+						'Updates available' => $this->get_amount_of_plugin_updates(),
+						'Last sync'         => date( 'Y-m-d H:i:s' ),
 					)
 				),
 			)
