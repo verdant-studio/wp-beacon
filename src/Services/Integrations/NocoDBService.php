@@ -32,12 +32,10 @@ class NocoDBService
 	private const CONTENT_TYPE = 'application/json';
 
 	private $settings;
-	private $site_record;
 
 	public function __construct()
 	{
-		$this->settings    = get_option( 'wp_beacon_settings' );
-		$this->site_record = get_option( 'wp_beacon_site_record' );
+		$this->settings = get_option( 'wp_beacon_settings' );
 	}
 
 	/**
@@ -52,8 +50,6 @@ class NocoDBService
 
 			foreach ($sites as $site) {
 				switch_to_blog( $site->blog_id );
-				$this->settings = get_option('wp_beacon_settings');
-				$this->site_record = get_option('wp_beacon_site_record');
 				$this->sync_single_site();
 				restore_current_blog();
 			}
@@ -72,16 +68,19 @@ class NocoDBService
 		if ( ! $this->has_valid_settings()) {
 			return new WP_Error(
 				'missing_settings',
-				esc_html__( 'NocoDB sync error: Missing required settings.', 'wp-beacon' )
+				esc_html__( 'NocoDB sync error: missing required settings.', 'wp-beacon' )
 			);
 		}
 
-		$record_id = $this->site_record ? json_decode($this->site_record)->Id : null;
+		$blog_id = get_current_blog_id();
+
+		$site_record = get_option('wp_beacon_site_' . $blog_id);
+		$record_id = $site_record ? json_decode($site_record)->Id : null;
 
 		if ($record_id && $this->record_exists($record_id)) {
-			return $this->update_record();
+			return $this->update_record($blog_id, $record_id);
 		} else {
-			return $this->create_record();
+			return $this->create_record($blog_id);
 		}
 	}
 
@@ -128,11 +127,11 @@ class NocoDBService
 	 *
 	 * @since 1.0.0
 	 */
-	private function create_record()
+	private function create_record($blog_id = null)
 	{
 		$response = $this->send_request('POST', $this->get_request_body());
 
-		return $this->handle_response($response);
+		return $this->handle_response($response, $blog_id);
 	}
 
 	/**
@@ -140,14 +139,14 @@ class NocoDBService
 	 *
 	 * @since 1.0.0
 	 */
-	private function update_record()
+	private function update_record($blog_id = null, $record_id = null)
 	{
 		$body = $this->get_request_body();
-		$body['Id'] = json_decode( $this->site_record )->Id;
+		$body['Id'] = $record_id;
 
 		$response = $this->send_request('PATCH', $body);
 
-		return $this->handle_response($response);
+		return $this->handle_response($response, $blog_id);
 	}
 
 	/**
@@ -196,7 +195,7 @@ class NocoDBService
 	 * @return array|string|WP_Error
 	 * @since 1.0.0
 	 */
-	private function handle_response(array $response)
+	private function handle_response(array $response, $blog_id = null)
 	{
 		if (is_wp_error( $response )) {
 			return new WP_Error(
@@ -210,7 +209,13 @@ class NocoDBService
 
 		$response_code = wp_remote_retrieve_response_code( $response );
 		if ($response_code >= 200 && $response_code < 300) {
-			return update_option( 'wp_beacon_site_record', wp_remote_retrieve_body( $response ) );
+			$option_name = 'wp_beacon_site';
+
+			if ($blog_id) {
+				$option_name .= '_' . $blog_id;
+			}
+
+			return update_option($option_name, wp_remote_retrieve_body($response));
 		} else {
 			return new WP_Error(
 				'nocodb_sync_error',
