@@ -30,7 +30,7 @@ trait MetricsTrait
 	 */
 	public function get_site_name(): ?string
 	{
-		return get_bloginfo( 'name' ) ?? 'N.A.';
+		return get_bloginfo( 'name' ) ?? __( 'N/A', 'wp-beacon' );
 	}
 
 	/**
@@ -40,7 +40,7 @@ trait MetricsTrait
 	 */
 	public function get_site_url(): ?string
 	{
-		return get_bloginfo( 'url' ) ?? 'N.A.';
+		return get_bloginfo( 'url' ) ?? __( 'N/A', 'wp-beacon' );
 	}
 
 	/**
@@ -50,7 +50,7 @@ trait MetricsTrait
 	 */
 	public function get_current_wp_version(): ?string
 	{
-		return get_bloginfo( 'version' ) ?? 'N.A.';
+		return get_bloginfo( 'version' ) ?? __( 'N/A', 'wp-beacon' );
 	}
 
 	/**
@@ -60,7 +60,32 @@ trait MetricsTrait
 	 */
 	public function get_site_health_rating(): int
 	{
-		return 5;
+		$summary = get_transient( 'health-check-site-status-result' );
+
+		// If the transient returns false, handle it appropriately.
+		if (false === $summary) {
+			return 0;
+		}
+
+		if (is_array( $summary ) && isset( $summary['counts'] )) {
+			$counts      = $summary['counts'];
+			$good        = $counts['good'] ?? 0;
+			$recommended = $counts['recommended'] ?? 0;
+			$critical    = $counts['critical'] ?? 0;
+
+			// Calculate the rating based on the counts.
+			$total = $good + $recommended + $critical;
+
+			if (0 === $total) {
+				return 0;
+			}
+
+			// Example calculation: 5 stars for all good, 3 stars for all recommended, 1 star for all critical.
+			$rating = ( 5 * $good + 3 * $recommended + 1 * $critical ) / $total;
+			return (int) round( $rating );
+		}
+
+		return 0;
 	}
 
 	/**
@@ -70,6 +95,21 @@ trait MetricsTrait
 	 */
 	public function get_amount_of_plugin_updates(): int
 	{
-		return 9;
+		if ( ! function_exists( 'wp_update_plugins' )) {
+			require_once ABSPATH . WPINC . '/update.php';
+		}
+
+		wp_update_plugins();
+		$update_plugins = get_site_transient( 'update_plugins' );
+
+		$count_outdated = 0;
+
+		if (isset( $update_plugins->response )) {
+			foreach ($update_plugins->response as $update_plugin) {
+				++$count_outdated;
+			}
+		}
+
+		return $count_outdated;
 	}
 }
