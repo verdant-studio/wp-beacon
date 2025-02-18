@@ -46,7 +46,7 @@ export function NocoDB({ data, update }) {
 						className="wpbcn:w-full"
 						name="url"
 						onChange={(e) => handleChange('url', e.target.value)}
-						placeholder="e.g. https://app.nocodb.com/api/v2/tables"
+						placeholder="e.g. https://app.nocodb.com"
 						type="text"
 						value={settings.url}
 					/>

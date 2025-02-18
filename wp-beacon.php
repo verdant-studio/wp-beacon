@@ -23,9 +23,9 @@ if ( ! defined( 'ABSPATH' )) {
 	exit;
 }
 
-const WP_BEACON_VERSION = '1.0.0';
+const WP_BEACON_VERSION             = '1.0.0';
 const WP_BEACON_REQUIRED_WP_VERSION = '6.0';
-const WP_BEACON_FILE = __FILE__;
+const WP_BEACON_FILE                = __FILE__;
 
 define( 'WP_BEACON_DIR_PATH', plugin_dir_path( WP_BEACON_FILE ) );
 define( 'WP_BEACON_PLUGIN_URL', plugins_url( '/', WP_BEACON_FILE ) );

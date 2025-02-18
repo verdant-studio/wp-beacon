@@ -29,7 +29,8 @@
 	},
 	"require": {
 		"php-di/php-di": "^6.0",
-		"doctrine/annotations": "^1.13"
+		"doctrine/annotations": "^1.13",
+		"ext-json": "*"
 	},
 	"require-dev": {
 		"brianhenryie/strauss": "^0.15.0",

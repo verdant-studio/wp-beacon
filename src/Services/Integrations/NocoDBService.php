@@ -45,6 +45,26 @@ class NocoDBService
 	 */
 	public function sync()
 	{
+		if (is_multisite()) {
+			$sites = get_sites();
+
+			foreach ($sites as $site) {
+				switch_to_blog( $site->blog_id );
+				$this->sync_single_site();
+				restore_current_blog();
+			}
+		} else {
+			$this->sync_single_site();
+		}
+	}
+
+	/**
+	 * Sync a single site.
+	 *
+	 * @since 1.0.0
+	 */
+	public function sync_single_site()
+	{
 		$settings = $this->settings;
 
 		if ( ! $settings || ! isset( $settings['service_settings']['url'], $settings['service_settings']['table_id'], $settings['service_settings']['xc_token'] )) {
@@ -154,17 +174,25 @@ class NocoDBService
 		if (is_wp_error( $response )) {
 			return new WP_Error(
 				'nocodb_sync_error',
-				esc_html__( 'NocoDB sync error: ' . $response->get_error_message(), 'wp-beacon' )
+				sprintf(
+				// translators: %s: error message.
+					esc_html__( 'NocoDB sync error: %s', 'wp-beacon' ),
+					$response->get_error_message()
+				)
 			);
 		} else {
 			$response_code = wp_remote_retrieve_response_code( $response );
-
 			if ($response_code >= 200 && $response_code < 300) {
 				return update_option( 'wp_beacon_site_record', wp_remote_retrieve_body( $response ) );
 			} else {
 				return new WP_Error(
 					'nocodb_sync_error',
-					esc_html__( 'NocoDB sync error: HTTP ' . $response_code . ' - ' . wp_remote_retrieve_body( $response ), 'wp-beacon' )
+					sprintf(
+					// translators: %1$d: response code, %2$s: response body.
+						esc_html__( 'NocoDB sync error: HTTP %1$d - %2$s', 'wp-beacon' ),
+						$response_code,
+						wp_remote_retrieve_body( $response )
+					)
 				);
 			}
 		}
