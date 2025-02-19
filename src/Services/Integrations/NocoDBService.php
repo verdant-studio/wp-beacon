@@ -157,21 +157,20 @@ class NocoDBService
 	/**
 	 * Link records.
 	 *
+	 * @return bool|WP_Error
 	 * @since 1.0.0
 	 */
-	private function link_records(): void
+	private function link_records()
 	{
 		$main_site_id = get_main_site_id();
 		switch_to_blog( $main_site_id );
 			$main_site_record = get_option( 'wp_beacon_site' );
 		restore_current_blog();
 
-		$current_site_record = get_option( 'wp_beacon_site' );
-
-		$main_site_record_decoded    = json_decode( $main_site_record, true );
+		$current_site_record         = get_option( 'wp_beacon_site' );
 		$current_site_record_decoded = json_decode( $current_site_record, true );
 
-		$url      = $this->settings['service_settings']['url'] . self::API_PATH . $this->settings['service_settings']['table_id'] . '/links/c339xhtw7dlp8os/records/' . json_decode( $current_site_record )->Id;
+		$url      = $this->settings['service_settings']['url'] . self::API_PATH . $this->settings['service_settings']['table_id'] . '/links/cwvkjbrlncn33ul/records/' . json_decode( $main_site_record )->Id;
 		$response = wp_remote_post(
 			$url,
 			array(
@@ -181,7 +180,6 @@ class NocoDBService
 				),
 				'body'    => wp_json_encode(
 					array(
-						$main_site_record_decoded,
 						$current_site_record_decoded,
 					)
 				),
@@ -189,14 +187,14 @@ class NocoDBService
 		);
 
 		if (is_wp_error( $response )) {
-			error_log( 'NocoDB link records error: ' . $response->get_error_message() );
-		} else {
-			$response_code = wp_remote_retrieve_response_code( $response );
-			if ($response_code >= 200 && $response_code < 300) {
-				error_log( 'NocoDB link records successful' );
-			} else {
-				error_log( 'NocoDB link records error: HTTP ' . $response_code . ' - ' . wp_remote_retrieve_body( $response ) );
-			}
+			return new WP_Error(
+				'nocodb_link_error',
+				sprintf(
+					// translators: %s: error message.
+					esc_html__( 'NocoDB link error: %s', 'wp-beacon' ),
+					$response->get_error_message()
+				)
+			);
 		}
 	}
 
@@ -243,7 +241,7 @@ class NocoDBService
 	/**
 	 * Handle the response.
 	 *
-	 * @return array|string|WP_Error
+	 * @return bool|WP_Error
 	 * @since 1.0.0
 	 */
 	private function handle_response( array $response )
