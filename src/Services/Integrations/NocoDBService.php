@@ -129,7 +129,14 @@ class NocoDBService
 	{
 		$response = $this->send_request( 'POST', $this->get_request_body() );
 
-		return $this->handle_response( $response );
+		$result = $this->handle_response( $response );
+
+		// Only link records if the request was successful and the site is not the main site.
+		if ( ! is_wp_error( $result ) && ! is_main_site()) {
+			$this->link_records();
+		}
+
+		return $result;
 	}
 
 	/**
@@ -145,6 +152,52 @@ class NocoDBService
 		$response = $this->send_request( 'PATCH', $body );
 
 		return $this->handle_response( $response );
+	}
+
+	/**
+	 * Link records.
+	 *
+	 * @since 1.0.0
+	 */
+	private function link_records(): void
+	{
+		$main_site_id = get_main_site_id();
+		switch_to_blog( $main_site_id );
+			$main_site_record = get_option( 'wp_beacon_site' );
+		restore_current_blog();
+
+		$current_site_record = get_option( 'wp_beacon_site' );
+
+		$main_site_record_decoded    = json_decode( $main_site_record, true );
+		$current_site_record_decoded = json_decode( $current_site_record, true );
+
+		$url      = $this->settings['service_settings']['url'] . self::API_PATH . $this->settings['service_settings']['table_id'] . '/links/c339xhtw7dlp8os/records/' . json_decode( $current_site_record )->Id;
+		$response = wp_remote_post(
+			$url,
+			array(
+				'headers' => array(
+					'Content-Type' => self::CONTENT_TYPE,
+					'xc-token'     => $this->settings['service_settings']['xc_token'],
+				),
+				'body'    => wp_json_encode(
+					array(
+						$main_site_record_decoded,
+						$current_site_record_decoded,
+					)
+				),
+			)
+		);
+
+		if (is_wp_error( $response )) {
+			error_log( 'NocoDB link records error: ' . $response->get_error_message() );
+		} else {
+			$response_code = wp_remote_retrieve_response_code( $response );
+			if ($response_code >= 200 && $response_code < 300) {
+				error_log( 'NocoDB link records successful' );
+			} else {
+				error_log( 'NocoDB link records error: HTTP ' . $response_code . ' - ' . wp_remote_retrieve_body( $response ) );
+			}
+		}
 	}
 
 	/**
