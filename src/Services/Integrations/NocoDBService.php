@@ -85,7 +85,6 @@ class NocoDBService
 	/**
 	 * Check if the settings are valid.
 	 *
-	 * @return bool
 	 * @since 1.0.0
 	 */
 	private function has_valid_settings(): bool
@@ -100,15 +99,12 @@ class NocoDBService
 	 */
 	private function record_exists( $record_id ): bool
 	{
-		$url = $this->settings['service_settings']['url'] . self::API_PATH . $this->settings['service_settings']['table_id'] . '/records/' . $record_id;
+		$url = $this->build_url( $record_id );
 
 		$response = wp_remote_get(
 			$url,
 			array(
-				'headers' => array(
-					'Content-Type' => self::CONTENT_TYPE,
-					'xc-token'     => $this->settings['service_settings']['xc_token'],
-				),
+				'headers' => $this->get_headers(),
 			)
 		);
 
@@ -157,27 +153,24 @@ class NocoDBService
 	/**
 	 * Link records.
 	 *
-	 * @return bool|WP_Error
+	 * @return void|WP_Error
 	 * @since 1.0.0
 	 */
 	private function link_records()
 	{
 		$main_site_id = get_main_site_id();
 		switch_to_blog( $main_site_id );
-			$main_site_record = get_option( 'wp_beacon_site' );
+		$main_site_record = get_option( 'wp_beacon_site' );
 		restore_current_blog();
 
 		$current_site_record         = get_option( 'wp_beacon_site' );
 		$current_site_record_decoded = json_decode( $current_site_record, true );
 
-		$url      = $this->settings['service_settings']['url'] . self::API_PATH . $this->settings['service_settings']['table_id'] . '/links/cwvkjbrlncn33ul/records/' . json_decode( $main_site_record )->Id;
+		$url      = $this->build_link_url( $main_site_record );
 		$response = wp_remote_post(
 			$url,
 			array(
-				'headers' => array(
-					'Content-Type' => self::CONTENT_TYPE,
-					'xc-token'     => $this->settings['service_settings']['xc_token'],
-				),
+				'headers' => $this->get_headers(),
 				'body'    => wp_json_encode(
 					array(
 						$current_site_record_decoded,
@@ -204,18 +197,15 @@ class NocoDBService
 	 * @return array|WP_Error
 	 * @since 1.0.0
 	 */
-	private function send_request(string $method, array $body )
+	private function send_request( string $method, array $body )
 	{
-		$url = $this->settings['service_settings']['url'] . self::API_PATH . $this->settings['service_settings']['table_id'] . '/records';
+		$url = $this->build_url();
 
 		return wp_remote_post(
 			$url,
 			array(
 				'method'  => $method,
-				'headers' => array(
-					'Content-Type' => self::CONTENT_TYPE,
-					'xc-token'     => $this->settings['service_settings']['xc_token'],
-				),
+				'headers' => $this->get_headers(),
 				'body'    => wp_json_encode( $body ),
 			)
 		);
@@ -271,5 +261,44 @@ class NocoDBService
 				)
 			);
 		}
+	}
+
+	/**
+	 * Build the URL.
+	 *
+	 * @since 1.0.0
+	 */
+	private function build_url( string $record_id = '' ): string
+	{
+		$url = $this->settings['service_settings']['url'] . self::API_PATH . $this->settings['service_settings']['table_id'] . '/records';
+
+		if ($record_id) {
+			$url .= '/' . $record_id;
+		}
+
+		return $url;
+	}
+
+	/**
+	 * Build the link URL.
+	 *
+	 * @since 1.0.0
+	 */
+	private function build_link_url( $main_site_record ): string
+	{
+		return $this->settings['service_settings']['url'] . self::API_PATH . $this->settings['service_settings']['table_id'] . '/links/cwvkjbrlncn33ul/records/' . json_decode( $main_site_record )->Id;
+	}
+
+	/**
+	 * Get headers.
+	 *
+	 * @since 1.0.0
+	 */
+	private function get_headers(): array
+	{
+		return array(
+			'Content-Type' => self::CONTENT_TYPE,
+			'xc-token'     => $this->settings['service_settings']['xc_token'],
+		);
 	}
 }
