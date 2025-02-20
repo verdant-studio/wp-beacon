@@ -78,7 +78,7 @@ class NocoDBService
 		if ($record_id && $this->record_exists( $record_id )) {
 			return $this->update_record( $record_id );
 		} else {
-			// If the record does not exist in NocoDB, delete the option in WordPress. This is in case the records were deleted in NocoDB.
+			// If the record does not exist in NocoDB, delete the option in WordPress. This is in case the records were deleted in remotely.
 			if ($record_id) {
 				delete_option( 'wp_beacon_site' );
 			}
@@ -129,8 +129,7 @@ class NocoDBService
 	private function create_record()
 	{
 		$response = $this->send_request( 'POST', $this->get_request_body() );
-
-		$result = $this->handle_response( $response );
+		$result   = $this->handle_response( $response );
 
 		// Only link records if the request was successful and the site is not the main site.
 		if ( ! is_wp_error( $result ) && ! is_main_site()) {

@@ -1,7 +1,7 @@
 {
 	"name": "verdantstudio/wp-beacon",
 	"description": "Synchronize your sites metrics to a no-code databases",
-	"type": "project",
+	"type": "wordpress-plugin",
 	"scripts": {
 		"phpcs": "./vendor/squizlabs/php_codesniffer/bin/phpcs",
 		"phpcbf": "phpcbf",
@@ -15,7 +15,8 @@
 		],
 		"strauss": [
 			"vendor/bin/strauss"
-		]
+		],
+		"unit": "./vendor/bin/phpunit --colors=always"
 	},
 	"autoload": {
 		"psr-4": {

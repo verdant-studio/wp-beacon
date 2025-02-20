@@ -48,8 +48,6 @@ export function Settings({ wpObject }) {
 		setError(null);
 		setSaving(true);
 
-		console.log('settings', settings)
-
 		return fetch
 			.put('/settings', settings)
 			.then(

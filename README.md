@@ -29,9 +29,6 @@ npm run build
 
 # unit test
 composer run unit
-
-# create coverage report
-composer run unit-coverage
 ```
 
 ## Debugging
