@@ -78,6 +78,11 @@ class NocoDBService
 		if ($record_id && $this->record_exists( $record_id )) {
 			return $this->update_record( $record_id );
 		} else {
+			// If the record does not exist in NocoDB, delete the option in WordPress. This is in case the records were deleted in NocoDB.
+			if ($record_id) {
+				delete_option( 'wp_beacon_site' );
+			}
+
 			return $this->create_record();
 		}
 	}
