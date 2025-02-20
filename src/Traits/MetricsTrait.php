@@ -67,11 +67,12 @@ trait MetricsTrait
 			return 0;
 		}
 
-		if (is_array( $summary ) && isset( $summary['counts'] )) {
-			$counts      = $summary['counts'];
-			$good        = $counts['good'] ?? 0;
-			$recommended = $counts['recommended'] ?? 0;
-			$critical    = $counts['critical'] ?? 0;
+		$summary = json_decode( $summary, true );
+
+		if (is_array( $summary )) {
+			$good        = $summary['good'] ?? 0;
+			$recommended = $summary['recommended'] ?? 0;
+			$critical    = $summary['critical'] ?? 0;
 
 			// Calculate the rating based on the counts.
 			$total = $good + $recommended + $critical;
