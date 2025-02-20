@@ -74,7 +74,7 @@ export function NocoDB({ data, update }) {
 						className="wpbcn:w-full"
 						name="xc_token"
 						onChange={(e) => handleChange('xc_token', e.target.value)}
-						type="text"
+						type="password"
 						value={settings.xc_token}
 					/>
 				</div>
