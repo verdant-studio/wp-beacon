@@ -1,6 +1,7 @@
 # Files
 *.map
 .DS_Store
+.phpunit.result.cache
 
 # Folders
 dist

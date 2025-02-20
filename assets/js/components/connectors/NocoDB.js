@@ -18,7 +18,6 @@ export function NocoDB({ data, update }) {
 
 	// Set database data at render.
 	useEffect(() => {
-		console.log(data);
 		setSettings({
 			url: data?.url ?? '',
 			table_id: data?.table_id ?? '',
@@ -33,8 +32,6 @@ export function NocoDB({ data, update }) {
 		update(updatedSettings);
 	};
 
-	console.log(settings);
-
 	return (
 		<Base title={__('NocoDB Settings', 'wp-beacon')}>
 			<div className="wpbcn:gap-2 wpbcn:grid md:wpbcn:grid-cols-4">
@@ -46,7 +43,7 @@ export function NocoDB({ data, update }) {
 						className="wpbcn:w-full"
 						name="url"
 						onChange={(e) => handleChange('url', e.target.value)}
-						placeholder="e.g. https://app.nocodb.com/api/v2/tables"
+						placeholder="e.g. https://app.nocodb.com"
 						type="text"
 						value={settings.url}
 					/>

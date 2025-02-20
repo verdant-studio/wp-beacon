@@ -19,7 +19,7 @@ export function Settings({ wpObject }) {
 	const [saving, setSaving] = useState(false);
 	const [schedules, setSchedules] = useState([]);
 	const [settings, setSettings] = useState({
-		schedule: '',
+		schedule: DEFAULT_SCHEDULE,
 		service: '',
 		service_settings: [],
 	});
@@ -34,10 +34,11 @@ export function Settings({ wpObject }) {
 	const getSettings = () => {
 		return fetch.get('/settings').then((json) => {
 			setSettings({
-				schedule: json.value.settings.schedule,
+				schedule: json.value.settings.schedule ?? DEFAULT_SCHEDULE,
 				service: json.value.settings.service,
 				service_settings: json.value.settings.service_settings,
 			});
+
 			setSchedules(json.value.schedules);
 		});
 	};

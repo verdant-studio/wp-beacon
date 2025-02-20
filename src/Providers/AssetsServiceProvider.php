@@ -16,6 +16,8 @@ if ( ! defined( 'ABSPATH' )) {
 	exit;
 }
 
+use Error;
+
 /**
  * Register assets service provider.
  *
