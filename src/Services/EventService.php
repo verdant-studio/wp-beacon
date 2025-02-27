@@ -67,10 +67,15 @@ class EventService extends Service
 	 */
 	public function trigger_sync(): void
 	{
-		$settings = get_option( 'wp_beacon_settings' );
+		if (defined( 'WP_BEACON_SERVICE' )) {
+			$service = WP_BEACON_SERVICE;
+		} else {
+			$settings = get_option( 'wp_beacon_settings' );
+			$service  = $settings['service'] ?? null;
+		}
 
-		if ($settings && isset( $settings['service'] )) {
-			switch ($settings['service']) {
+		if ($service) {
+			switch ($service) {
 				case 'airtable':
 					AirtableService::sync();
 					break;
