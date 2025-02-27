@@ -2,6 +2,9 @@
 
 > Synchronize your sites metrics to a no-code databases.
 
+> [!IMPORTANT]  
+> This plugin is not yet ready for production.
+
 ## Requirements
 
 - PHP >7.4
@@ -31,10 +34,6 @@ npm run build
 composer run unit
 ```
 
-## Debugging
+## Documentation
 
-Tip: by using [WP-Crontrol plugin](https://wordpress.org/plugins/wp-crontrol/) you can view all the active cron jobs and their information from the wp-admin.
-
-## Wiki
-
-A technical wiki is available at [https://github.com/verdant-studio/wiki/tree/main/wp-beacon](https://github.com/verdant-studio/wiki/tree/main/wp-beacon)
+View the [documentation](https://docs.verdant.studio/wp-beacon/) for more information.
