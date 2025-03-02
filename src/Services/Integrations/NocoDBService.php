@@ -36,6 +36,21 @@ class NocoDBService
 	public function __construct()
 	{
 		$this->settings = get_option( 'wp_beacon_settings' );
+
+		if ($this->is_config_set()) {
+			$this->settings['service']                      = WP_BEACON_SERVICE;
+			$this->settings['schedule']                     = WP_BEACON_SCHEDULE;
+			$this->settings['service_settings']['url']      = WP_BEACON_NOCODB_URL;
+			$this->settings['service_settings']['table_id'] = WP_BEACON_NOCODB_TABLE_ID;
+			$this->settings['service_settings']['xc_token'] = WP_BEACON_NOCODB_XC_TOKEN;
+		}
+	}
+
+	public function is_config_set(): bool
+	{
+		return defined( 'WP_BEACON_SERVICE' ) && defined( 'WP_BEACON_SCHEDULE' ) &&
+			defined( 'WP_BEACON_NOCODB_URL' ) && defined( 'WP_BEACON_NOCODB_TABLE_ID' ) &&
+			defined( 'WP_BEACON_NOCODB_XC_TOKEN' );
 	}
 
 	/**
@@ -94,7 +109,7 @@ class NocoDBService
 	 */
 	private function has_valid_settings(): bool
 	{
-		return $this->settings && isset( $this->settings['service_settings']['url'], $this->settings['service_settings']['table_id'], $this->settings['service_settings']['xc_token'] );
+		return isset( $this->settings['service_settings']['url'], $this->settings['service_settings']['table_id'], $this->settings['service_settings']['xc_token'] );
 	}
 
 	/**
