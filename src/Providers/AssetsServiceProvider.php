@@ -17,6 +17,7 @@ if ( ! defined( 'ABSPATH' )) {
 }
 
 use Error;
+use WPBeacon\Services\Integrations\NocoDBService;
 
 /**
  * Register assets service provider.
@@ -74,12 +75,16 @@ class AssetsServiceProvider extends ServiceProvider
 
 		wp_enqueue_script( wp_beacon_prefix( 'settings-js' ) );
 
+		// Get the NocoDBService instance
+		$noco_db_service = new NocoDBService();
+
 		wp_localize_script(
 			wp_beacon_prefix( 'settings-js' ),
 			'wpBeaconSettings',
 			array(
-				'nonce'     => wp_create_nonce( 'wp_rest' ),
-				'ajax_base' => esc_url_raw( rest_url( 'wp-beacon/v1' ) ),
+				'nonce'      => wp_create_nonce( 'wp_rest' ),
+				'ajax_base'  => esc_url_raw( rest_url( 'wp-beacon/v1' ) ),
+				'config_set' => $noco_db_service->is_config_set(),
 			)
 		);
 	}

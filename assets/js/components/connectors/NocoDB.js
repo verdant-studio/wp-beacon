@@ -9,7 +9,7 @@ import { __ } from '@wordpress/i18n';
  */
 import { Base } from './Base';
 
-export function NocoDB({ data, update }) {
+export function NocoDB({ data, disabled, update }) {
 	const [settings, setSettings] = useState({
 		url: '',
 		table_id: '',
@@ -41,6 +41,7 @@ export function NocoDB({ data, update }) {
 				<div className="wpbcn:col-span-3">
 					<input
 						className="wpbcn:w-full"
+						disabled={disabled}
 						name="url"
 						onChange={(e) => handleChange('url', e.target.value)}
 						placeholder="e.g. https://app.nocodb.com"
@@ -57,6 +58,7 @@ export function NocoDB({ data, update }) {
 				<div className="wpbcn:col-span-3">
 					<input
 						className="wpbcn:w-full"
+						disabled={disabled}
 						name="table_id"
 						onChange={(e) => handleChange('table_id', e.target.value)}
 						type="text"
@@ -72,6 +74,7 @@ export function NocoDB({ data, update }) {
 				<div className="wpbcn:col-span-3">
 					<input
 						className="wpbcn:w-full"
+						disabled={disabled}
 						name="xc_token"
 						onChange={(e) => handleChange('xc_token', e.target.value)}
 						type="password"
