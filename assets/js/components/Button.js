@@ -4,16 +4,19 @@
 import React, { useEffect, useState } from 'react';
 import { __, sprintf } from '@wordpress/i18n';
 
-export function Button({ children, loading, onClick }) {
+export function Button({ children, disabled, loading, onClick }) {
 	return (
 		<button
-			className="wpbcn:bg-black wpbcn:cursor-pointer wpbcn:flex wpbcn:px-3 wpbcn:py-2.5 wpbcn:rounded wpbcn:space-x-1 wpbcn:text-sm wpbcn:text-white hover:wpbcn:bg-neutral-800"
+			className={`wpbcn:flex wpbcn:rounded wpbcn:px-3 wpbcn:text-sm wpbcn:text-white wpbcn:py-2.5 wpbcn:space-x-1 hover:wpbcn:bg-neutral-800 ${
+				disabled ? 'wpbcn:cursor-not-allowed wpbcn:bg-gray-400' : 'wpbcn:cursor-pointer wpbcn:bg-black'
+			}`}
+			disabled={disabled}
 			onClick={onClick}
 		>
 			{loading && (
 				<svg
 					aria-hidden="true"
-					className="wpbcn:animate-spin wpbcn:fill-cyan-400 wpbcn:h-5 wpbcn:text-white wpbcn:w-5"
+					className="wpbcn:h-5 wpbcn:w-5 wpbcn:animate-spin wpbcn:fill-cyan-400 wpbcn:text-white"
 					fill="none"
 					viewBox="0 0 100 101"
 					xmlns="http://www.w3.org/2000/svg"
