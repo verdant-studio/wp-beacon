@@ -46,7 +46,6 @@ class EventService extends Service
 	 */
 	public function register(): void
 	{
-		// Register WP-Cron hooks.
 		$this->register_cron_hooks();
 	}
 
@@ -67,10 +66,15 @@ class EventService extends Service
 	 */
 	public function trigger_sync(): void
 	{
-		$settings = get_option( 'wp_beacon_settings' );
+		if (defined( 'WP_BEACON_SERVICE' )) {
+			$service = WP_BEACON_SERVICE;
+		} else {
+			$settings = get_option( 'wp_beacon_settings' );
+			$service  = $settings['service'] ?? null;
+		}
 
-		if ($settings && isset( $settings['service'] )) {
-			switch ($settings['service']) {
+		if ($service) {
+			switch ($service) {
 				case 'airtable':
 					AirtableService::sync();
 					break;
@@ -98,8 +102,9 @@ class EventService extends Service
 	 *
 	 * @since 1.0.0
 	 */
-	public static function schedule( $schedule, $recurrence ): void
+	public static function schedule( string $hook, string $recurrence ): void
 	{
+
 		$schedules = SettingsServiceProvider::get_cron_schedules();
 
 		// Ensure the recurrence is valid.
@@ -107,7 +112,7 @@ class EventService extends Service
 			$recurrence = SettingsServiceProvider::DEFAULT_CRON_SCHEDULE;
 		}
 
-		self::maybe_schedule_event( $schedule, $recurrence );
+		self::maybe_schedule_event( $hook, $recurrence );
 	}
 
 	/**
@@ -115,7 +120,7 @@ class EventService extends Service
 	 *
 	 * @since 1.0.0
 	 */
-	public static function reschedule(string $hook, string $recurrence ): void
+	public static function reschedule( string $hook, string $recurrence ): void
 	{
 		self::unschedule( $hook );
 		self::schedule( $hook, $recurrence );
@@ -124,11 +129,18 @@ class EventService extends Service
 	/**
 	 * Conditionally schedule a WordPress event if the setting is enabled.
 	 */
-	private static function maybe_schedule_event( string $hook, string $recurrence ): void
+	private static function maybe_schedule_event(string $hook, string $recurrence ): void
 	{
-		$settings = get_option( 'wp_beacon_settings' );
+		if (defined( 'WP_BEACON_SERVICE' ) && defined( 'WP_BEACON_SCHEDULE' )) {
+			$settings = array(
+				'service'  => WP_BEACON_SERVICE,
+				'schedule' => WP_BEACON_SCHEDULE,
+			);
+		} else {
+			$settings = get_option( 'wp_beacon_settings' );
+		}
 
-		if ( self::is_enabled( $settings ) ) {
+		if (self::is_enabled( $settings )) {
 			self::schedule_event_if_not_exists( $hook, $recurrence );
 		}
 	}
@@ -150,6 +162,7 @@ class EventService extends Service
 	 */
 	private static function schedule_event_if_not_exists( string $hook, string $recurrence ): void
 	{
+		// TODO: the custom schedules are not available at this point.
 		if ( ! wp_next_scheduled( $hook ) ) {
 			wp_schedule_event( time(), $recurrence, $hook );
 		}

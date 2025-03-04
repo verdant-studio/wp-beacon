@@ -24,28 +24,36 @@ use WPBeacon\Traits\MetricsTrait;
  *
  * @since 1.0.0
  */
-class NocoDBService
+class NocoDBService extends IntegrationService
 {
 	use MetricsTrait;
 
 	private const API_PATH     = '/api/v2/tables/';
 	private const CONTENT_TYPE = 'application/json';
 
-	private $settings;
-
-	public function __construct()
+	/**
+	 * @inheritDoc
+	 *
+	 * @since 1.0.0
+	 */
+	protected function get_config_settings(): array
 	{
-		$this->settings = get_option( 'wp_beacon_settings' );
-
-		if ($this->is_config_set()) {
-			$this->settings['service']                      = WP_BEACON_SERVICE;
-			$this->settings['schedule']                     = WP_BEACON_SCHEDULE;
-			$this->settings['service_settings']['url']      = WP_BEACON_NOCODB_URL;
-			$this->settings['service_settings']['table_id'] = WP_BEACON_NOCODB_TABLE_ID;
-			$this->settings['service_settings']['xc_token'] = WP_BEACON_NOCODB_XC_TOKEN;
-		}
+		return array(
+			'service'          => WP_BEACON_SERVICE,
+			'schedule'         => WP_BEACON_SCHEDULE,
+			'service_settings' => array(
+				'url'      => WP_BEACON_NOCODB_URL,
+				'table_id' => WP_BEACON_NOCODB_TABLE_ID,
+				'xc_token' => WP_BEACON_NOCODB_XC_TOKEN,
+			),
+		);
 	}
 
+	/**
+	 * @inheritDoc
+	 *
+	 * @since 1.0.0
+	 */
 	public function is_config_set(): bool
 	{
 		return defined( 'WP_BEACON_SERVICE' ) && defined( 'WP_BEACON_SCHEDULE' ) &&
