@@ -75,7 +75,6 @@ class AssetsServiceProvider extends ServiceProvider
 
 		wp_enqueue_script( wp_beacon_prefix( 'settings-js' ) );
 
-		// Get the NocoDBService instance
 		$noco_db_service = new NocoDBService();
 
 		wp_localize_script(
