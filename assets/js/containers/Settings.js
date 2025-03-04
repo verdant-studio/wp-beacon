@@ -13,7 +13,7 @@ import { Airtable } from '../components/connectors/Airtable';
 import { NocoDB } from '../components/connectors/NocoDB';
 
 export function Settings({ wpObject }) {
-	const DEFAULT_SCHEDULE = 'wp_beacon_12_hour';
+	const DEFAULT_SCHEDULE = 'daily';
 
 	const [error, setError] = useState(null);
 	const [saving, setSaving] = useState(false);
@@ -121,7 +121,7 @@ export function Settings({ wpObject }) {
 							>
 								{Object.entries(schedules).map(([key, value]) => (
 									<option key={key} value={key}>
-										{value}
+										{value.display}
 									</option>
 								))}
 							</select>

@@ -35,21 +35,6 @@ class ApiController
 		$settings  = get_option( 'wp_beacon_settings' );
 		$schedules = wp_get_schedules();
 
-		// Show only the schedules defined for this plugin.
-		$schedules = array_filter(
-			$schedules,
-			static fn ( $key ) => str_starts_with( $key, 'wp_beacon_' ),
-			ARRAY_FILTER_USE_KEY
-		);
-		uasort(
-			$schedules,
-			static fn ( array $a, array $b ): int => (int) $b['interval'] - (int) $a['interval']
-		);
-		$schedules = array_map(
-			static fn ( array $schedule ): string => $schedule['display'],
-			$schedules
-		);
-
 		return new \WP_REST_Response(
 			array(
 				'success' => true,
@@ -80,6 +65,9 @@ class ApiController
 		);
 
 		update_option( 'wp_beacon_settings', $settings );
+
+		// Delete transient in case the schedule was set by env variables earlier.
+		delete_transient( 'wp_beacon_last_schedule' );
 
 		EventService::reschedule( EventService::CRON_BEACON_PUSH_EVENT, $schedule );
 
