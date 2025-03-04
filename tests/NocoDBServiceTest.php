@@ -17,6 +17,8 @@ class NocoDBServiceTest extends TestCase
 		Brain\Monkey\setUp();
 
 		$settings = array(
+			'schedule'         => 'daily',
+			'service'          => 'noco_db',
 			'service_settings' => array(
 				'url'      => 'https://example.com',
 				'table_id' => '12345',

@@ -29,7 +29,7 @@ class EventService extends Service
 {
 	private NocoDBService $noco_db_service;
 
-	public function __construct(NocoDBService $noco_db_service )
+	public function __construct( NocoDBService $noco_db_service )
 	{
 		$this->noco_db_service = $noco_db_service;
 	}
@@ -104,8 +104,7 @@ class EventService extends Service
 	 */
 	public static function schedule( string $hook, string $recurrence ): void
 	{
-
-		$schedules = SettingsServiceProvider::get_cron_schedules();
+		$schedules = wp_get_schedules();
 
 		// Ensure the recurrence is valid.
 		if ( ! isset( $schedules[ $recurrence ] ) ) {
@@ -162,7 +161,6 @@ class EventService extends Service
 	 */
 	private static function schedule_event_if_not_exists( string $hook, string $recurrence ): void
 	{
-		// TODO: the custom schedules are not available at this point.
 		if ( ! wp_next_scheduled( $hook ) ) {
 			wp_schedule_event( time(), $recurrence, $hook );
 		}
