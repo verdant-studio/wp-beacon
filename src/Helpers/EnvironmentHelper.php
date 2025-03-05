@@ -28,6 +28,6 @@ class EnvironmentHelper
 	 */
 	public static function get_environment_key(): string
 	{
-		return defined( 'WP_ENVIRONMENT_TYPE' ) ? WP_ENVIRONMENT_TYPE : 'production';
+		return defined( 'WP_ENVIRONMENT_TYPE' ) ? WP_ENVIRONMENT_TYPE : '';
 	}
 }

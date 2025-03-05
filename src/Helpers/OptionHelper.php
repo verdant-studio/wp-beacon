@@ -26,11 +26,11 @@ class OptionHelper
 	/**
 	 * Get the option key based on the given prefix.
 	 */
-	private static function get_option_key(string $prefix ): string
+	private static function get_option_key( string $prefix ): string
 	{
 		$env_key = EnvironmentHelper::get_environment_key();
 
-		return $prefix . ( 'production' !== $env_key ? '_' . $env_key : '' );
+		return $env_key ? $prefix . '_' . $env_key : $prefix;
 	}
 
 	/**
