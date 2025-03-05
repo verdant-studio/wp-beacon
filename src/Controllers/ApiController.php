@@ -16,6 +16,7 @@ if ( ! defined( 'ABSPATH' )) {
 	exit;
 }
 
+use WPBeacon\Helpers\OptionHelper;
 use WPBeacon\Services\EventService;
 
 /**
@@ -32,7 +33,7 @@ class ApiController
 	 */
 	public static function get_settings(): \WP_REST_Response
 	{
-		$settings  = get_option( 'wp_beacon_settings' );
+		$settings  = get_option( OptionHelper::get_settings_option_key() );
 		$schedules = wp_get_schedules();
 
 		return new \WP_REST_Response(
@@ -64,7 +65,7 @@ class ApiController
 			'service_settings' => $service_settings,
 		);
 
-		update_option( 'wp_beacon_settings', $settings );
+		update_option( OptionHelper::get_settings_option_key(), $settings );
 
 		// Delete transient in case the schedule was set by env variables earlier.
 		delete_transient( 'wp_beacon_last_schedule' );

@@ -16,6 +16,7 @@ if ( ! defined( 'ABSPATH' )) {
 	exit;
 }
 
+use WPBeacon\Helpers\OptionHelper;
 use WPBeacon\Providers\SettingsServiceProvider;
 use WPBeacon\Services\Integrations\AirtableService;
 use WPBeacon\Services\Integrations\NocoDBService;
@@ -69,7 +70,7 @@ class EventService extends Service
 		if (defined( 'WP_BEACON_SERVICE' )) {
 			$service = WP_BEACON_SERVICE;
 		} else {
-			$settings = get_option( 'wp_beacon_settings' );
+			$settings = get_option( OptionHelper::get_settings_option_key() );
 			$service  = $settings['service'] ?? null;
 		}
 
@@ -136,7 +137,7 @@ class EventService extends Service
 				'schedule' => WP_BEACON_SCHEDULE,
 			);
 		} else {
-			$settings = get_option( 'wp_beacon_settings' );
+			$settings = get_option( OptionHelper::get_settings_option_key() );
 		}
 
 		if (self::is_enabled( $settings )) {
