@@ -58,6 +58,22 @@ abstract class IntegrationService
 	abstract protected function is_config_set(): bool;
 
 	/**
+	 * Get the environment key (defaults to production).
+	 */
+	private function get_environment_key(): string
+	{
+		return defined( 'WP_ENVIRONMENT_TYPE' ) ? WP_ENVIRONMENT_TYPE : 'production';
+	}
+
+	/**
+	 * Get the option key.
+	 */
+	protected function get_option_key(): string
+	{
+		return 'wp_beacon_site_' . $this->get_environment_key();
+	}
+
+	/**
 	 * Check if the schedule has changed.
 	 *
 	 * @since 1.0.0

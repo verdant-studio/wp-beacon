@@ -95,7 +95,7 @@ class NocoDBService extends IntegrationService
 			);
 		}
 
-		$site_record = get_option( 'wp_beacon_site' );
+		$site_record = get_option( $this->get_option_key() );
 		$record_id   = $site_record ? json_decode( $site_record )->Id : null;
 
 		if ($record_id && $this->record_exists( $record_id )) {
@@ -103,7 +103,7 @@ class NocoDBService extends IntegrationService
 		} else {
 			// If the record does not exist in NocoDB, delete the option in WordPress. This is in case the records were deleted in remotely.
 			if ($record_id) {
-				delete_option( 'wp_beacon_site' );
+				delete_option( $this->get_option_key() );
 			}
 
 			return $this->create_record();
@@ -187,10 +187,10 @@ class NocoDBService extends IntegrationService
 	{
 		$main_site_id = get_main_site_id();
 		switch_to_blog( $main_site_id );
-		$main_site_record = get_option( 'wp_beacon_site' );
+		$main_site_record = get_option( $this->get_option_key() );
 		restore_current_blog();
 
-		$current_site_record         = get_option( 'wp_beacon_site' );
+		$current_site_record         = get_option( $this->get_option_key() );
 		$current_site_record_decoded = json_decode( $current_site_record, true );
 
 		$url      = $this->build_link_url( $main_site_record );
@@ -276,7 +276,7 @@ class NocoDBService extends IntegrationService
 
 		$response_code = wp_remote_retrieve_response_code( $response );
 		if ($response_code >= 200 && $response_code < 300) {
-			return update_option( 'wp_beacon_site', wp_remote_retrieve_body( $response ) );
+			return update_option( $this->get_option_key(), wp_remote_retrieve_body( $response ) );
 		} else {
 			return new WP_Error(
 				'nocodb_sync_error',
