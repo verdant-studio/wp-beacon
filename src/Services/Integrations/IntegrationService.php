@@ -16,6 +16,7 @@ if ( ! defined( 'ABSPATH' )) {
 	exit;
 }
 
+use WPBeacon\Helpers\OptionHelper;
 use WPBeacon\Services\EventService;
 
 /**
@@ -30,7 +31,7 @@ abstract class IntegrationService
 
 	public function __construct()
 	{
-		$this->ui_settings = get_option( 'wp_beacon_settings' );
+		$this->ui_settings = get_option( OptionHelper::get_settings_option_key() );
 
 		if ($this->is_config_set()) {
 			$this->settings = $this->get_config_settings();
@@ -58,22 +59,6 @@ abstract class IntegrationService
 	abstract protected function is_config_set(): bool;
 
 	/**
-	 * Get the environment key (defaults to production).
-	 */
-	private function get_environment_key(): string
-	{
-		return defined( 'WP_ENVIRONMENT_TYPE' ) ? WP_ENVIRONMENT_TYPE : 'production';
-	}
-
-	/**
-	 * Get the option key.
-	 */
-	protected function get_option_key(): string
-	{
-		return 'wp_beacon_site_' . $this->get_environment_key();
-	}
-
-	/**
 	 * Check if the schedule has changed.
 	 *
 	 * @since 1.0.0
@@ -85,7 +70,7 @@ abstract class IntegrationService
 			return $last_schedule !== $this->settings['schedule'];
 		}
 
-		$current_settings = get_option( 'wp_beacon_settings' );
+		$current_settings = get_option( OptionHelper::get_settings_option_key() );
 		return $current_settings['schedule'] !== $this->settings['schedule'];
 	}
 
