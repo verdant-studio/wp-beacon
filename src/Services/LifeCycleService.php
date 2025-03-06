@@ -16,6 +16,8 @@ if ( ! defined( 'ABSPATH' )) {
 	exit;
 }
 
+use WPBeacon\Helpers\OptionHelper;
+
 /**
  * Register life cycle service.
  *
@@ -58,5 +60,18 @@ class LifeCycleService extends Service
 	 */
 	public static function uninstall(): void
 	{
+		if ( is_multisite() ) {
+			delete_site_option( OptionHelper::get_settings_option_key() );
+
+			$sites = get_sites();
+			foreach ( $sites as $site ) {
+				switch_to_blog( $site->blog_id );
+				delete_option( OptionHelper::get_site_option_key() );
+				restore_current_blog();
+			}
+		} else {
+			delete_option( OptionHelper::get_site_option_key() );
+			delete_option( OptionHelper::get_settings_option_key() );
+		}
 	}
 }
