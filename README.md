@@ -5,6 +5,13 @@
 > [!IMPORTANT]  
 > This plugin is not yet ready for production.
 
+## Features
+
+- [x] Sync metrics to a no-code database
+- [x] Set settings via the admin or environment variables
+- [x] Multi-site support
+- [x] Multi-environment support (e.g. dev, staging, production)
+
 ## Requirements
 
 - PHP >7.4
