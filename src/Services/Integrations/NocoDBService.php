@@ -188,15 +188,17 @@ class NocoDBService extends IntegrationService
 	{
 		$main_site_id = get_main_site_id();
 		switch_to_blog( $main_site_id );
-		$main_site_record = get_option( OptionHelper::get_site_option_key() );
+		$main_site_record         = get_option( OptionHelper::get_site_option_key() );
+		$main_site_record_decoded = json_decode( $main_site_record, true );
 		restore_current_blog();
 
 		$current_site_record         = get_option( OptionHelper::get_site_option_key() );
 		$current_site_record_decoded = json_decode( $current_site_record, true );
 
-		$url      = $this->build_link_url( $main_site_record );
-		$response = wp_remote_post(
-			$url,
+		// Link main site record to current site record.
+		$main_site_link_url = $this->build_link_url( $main_site_record );
+		$main_site_response = wp_remote_post(
+			$main_site_link_url,
 			array(
 				'headers' => $this->get_headers(),
 				'body'    => wp_json_encode(
@@ -207,13 +209,34 @@ class NocoDBService extends IntegrationService
 			)
 		);
 
-		if (is_wp_error( $response )) {
+		if (is_wp_error( $main_site_response )) {
 			return new WP_Error(
 				'nocodb_link_error',
 				sprintf(
 					// translators: %s: error message.
 					esc_html__( 'NocoDB link error: %s', 'wp-beacon' ),
-					$response->get_error_message()
+					$main_site_response->get_error_message()
+				)
+			);
+		}
+
+		// Link current site record to main site record.
+		$current_site_link_url = $this->build_link_url( $current_site_record );
+		$current_site_response = wp_remote_post(
+			$current_site_link_url,
+			array(
+				'headers' => $this->get_headers(),
+				'body'    => wp_json_encode( array( $main_site_record_decoded ) ),
+			)
+		);
+
+		if (is_wp_error( $current_site_response )) {
+			return new WP_Error(
+				'nocodb_link_error',
+				sprintf(
+					// translators: %s: error message.
+					esc_html__( 'NocoDB link error: %s', 'wp-beacon' ),
+					$current_site_response->get_error_message()
 				)
 			);
 		}
@@ -314,7 +337,7 @@ class NocoDBService extends IntegrationService
 	 */
 	private function build_link_url( $main_site_record ): string
 	{
-		return $this->settings['service_settings']['url'] . self::API_PATH . $this->settings['service_settings']['table_id'] . '/links/cwvkjbrlncn33ul/records/' . json_decode( $main_site_record )->Id;
+		return $this->settings['service_settings']['url'] . self::API_PATH . $this->settings['service_settings']['table_id'] . '/links/c34hr5itch1tmey/records/' . json_decode( $main_site_record )->Id;
 	}
 
 	/**
