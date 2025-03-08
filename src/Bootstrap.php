@@ -22,6 +22,7 @@ use WPBeacon\Providers\AssetsServiceProvider;
 use WPBeacon\Providers\SettingsServiceProvider;
 use WPBeacon\Vendor_Prefixed\DI\ContainerBuilder;
 use WPBeacon\Vendor_Prefixed\Psr\Container\ContainerInterface;
+use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
 
 require_once __DIR__ . '/helpers.php';
 
@@ -58,6 +59,7 @@ final class Bootstrap
 		$this->providers = $this->get_providers();
 		$this->register_providers();
 		$this->boot_providers();
+		$this->check_for_update();
 	}
 
 	/**
@@ -119,5 +121,30 @@ final class Bootstrap
 		$builder->addDefinitions( $config_path );
 		$builder->useAnnotations( true );
 		return $builder->build();
+	}
+
+	/**
+	 * Checks for plugin updates.
+	 *
+	 * @since 1.0.0
+	 */
+	protected function check_for_update(): void
+	{
+		if ( ! class_exists( PucFactory::class )) {
+			return;
+		}
+
+		try {
+			$updater = PucFactory::buildUpdateChecker(
+				'https://github.com/verdant-studio/wp-beacon/',
+				WP_BEACON_DIR_PATH . '/wp-beacon.php',
+				'wp-beacon'
+			);
+
+			$updater->getVcsApi()->enableReleaseAssets();
+		} catch (\Throwable $e) {
+			// phpcs:ignore
+			error_log( $e->getMessage() );
+		}
 	}
 }
