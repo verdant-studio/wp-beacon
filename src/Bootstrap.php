@@ -59,7 +59,7 @@ final class Bootstrap
 		$this->providers = $this->get_providers();
 		$this->register_providers();
 		$this->boot_providers();
-		$this->check_for_update();
+		$this->check_for_updates();
 	}
 
 	/**
@@ -128,7 +128,7 @@ final class Bootstrap
 	 *
 	 * @since 1.0.0
 	 */
-	protected function check_for_update(): void
+	protected function check_for_updates(): void
 	{
 		if ( ! class_exists( PucFactory::class )) {
 			return;
