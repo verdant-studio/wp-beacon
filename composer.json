@@ -31,7 +31,8 @@
 	"require": {
 		"php-di/php-di": "^6.0",
 		"doctrine/annotations": "^1.13",
-		"ext-json": "*"
+		"ext-json": "*",
+		"yahnis-elsts/plugin-update-checker": "^5.5"
 	},
 	"require-dev": {
 		"brianhenryie/strauss": "^0.15.0",
@@ -45,7 +46,12 @@
 			"target_directory": "vendor-prefixed",
 			"namespace_prefix": "WPBeacon\\Vendor_Prefixed\\",
 			"classmap_prefix": "WPBeacon_Vendor_Prefixed_",
-			"constant_prefix": "WP_BEACON_VENDOR"
+			"constant_prefix": "WP_BEACON_VENDOR",
+			"exclude_from_copy": {
+				"packages": [
+					"yahnis-elsts/plugin-update-checker"
+				]
+			}
 		}
 	}
 }
