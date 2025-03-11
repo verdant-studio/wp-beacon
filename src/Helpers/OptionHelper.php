@@ -48,4 +48,12 @@ class OptionHelper
 	{
 		return self::get_option_key( 'wp_beacon_settings' );
 	}
+
+	/**
+	 * Get the ID of the links table column.
+	 */
+	public static function get_links_column_id(): string
+	{
+		return self::get_option_key( 'wp_beacon_links_column_id' );
+	}
 }

@@ -61,6 +61,7 @@ class LifeCycleService extends Service
 	public static function uninstall(): void
 	{
 		if ( is_multisite() ) {
+			delete_site_option( OptionHelper::get_links_column_id() );
 			delete_site_option( OptionHelper::get_settings_option_key() );
 
 			$sites = get_sites();
@@ -70,8 +71,9 @@ class LifeCycleService extends Service
 				restore_current_blog();
 			}
 		} else {
-			delete_option( OptionHelper::get_site_option_key() );
+			delete_option( OptionHelper::get_links_column_id() );
 			delete_option( OptionHelper::get_settings_option_key() );
+			delete_option( OptionHelper::get_site_option_key() );
 		}
 	}
 }

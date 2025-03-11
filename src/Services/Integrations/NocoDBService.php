@@ -29,7 +29,7 @@ class NocoDBService extends IntegrationService
 {
 	use MetricsTrait;
 
-	private const API_PATH     = '/api/v2/tables/';
+	private const API_PATH     = '/api/v2';
 	private const CONTENT_TYPE = 'application/json';
 
 	/**
@@ -155,6 +155,13 @@ class NocoDBService extends IntegrationService
 		$response = $this->send_request( 'POST', $this->get_request_body() );
 		$result   = $this->handle_response( $response );
 
+		// If the links column ID is not known yet, save it.
+		// TODO: this shouldn't be stored on all sites
+		$links_column_id = get_option( OptionHelper::get_links_column_id() );
+		if ( ! $links_column_id ) {
+			$this->get_and_save_links_column_id();
+		}
+
 		// Only link records if the request was successful and the site is not the main site.
 		if ( ! is_wp_error( $result ) && ! is_main_site()) {
 			$this->link_records();
@@ -176,6 +183,47 @@ class NocoDBService extends IntegrationService
 		$response = $this->send_request( 'PATCH', $body );
 
 		return $this->handle_response( $response );
+	}
+
+	/**
+	 * Get and save the column ID of the links record.
+	 *
+	 * @since 1.0.0
+	 */
+	private function get_and_save_links_column_id()
+	{
+		$url = $this->build_meta_url();
+
+		$response = wp_remote_get(
+			$url,
+			array(
+				'headers' => $this->get_headers(),
+			)
+		);
+
+		if (is_wp_error( $response )) {
+			return new WP_Error(
+				'nocodb_get_meta_error',
+				sprintf(
+					// translators: %s: error message.
+					esc_html__( 'NocoDB get table meta error: %s', 'wp-beacon' ),
+					$response->get_error_message()
+				)
+			);
+		}
+
+		$response_code = wp_remote_retrieve_response_code( $response );
+		if ($response_code >= 200 && $response_code < 300) {
+			$response_body = wp_remote_retrieve_body( $response );
+			$columns       = json_decode( $response_body, true );
+
+			foreach ($columns['columns'] as $column) {
+				if ('Network' === $column['title']) {
+					update_option( OptionHelper::get_links_column_id(), $column['id'] );
+					break;
+				}
+			}
+		}
 	}
 
 	/**
@@ -321,7 +369,7 @@ class NocoDBService extends IntegrationService
 	 */
 	private function build_url( string $record_id = '' ): string
 	{
-		$url = $this->settings['service_settings']['url'] . self::API_PATH . $this->settings['service_settings']['table_id'] . '/records';
+		$url = $this->settings['service_settings']['url'] . self::API_PATH . '/tables/' . $this->settings['service_settings']['table_id'] . '/records';
 
 		if ($record_id) {
 			$url .= '/' . $record_id;
@@ -331,13 +379,25 @@ class NocoDBService extends IntegrationService
 	}
 
 	/**
+	 * Build the meta URL.
+	 *
+	 * @since 1.0.0
+	 */
+	private function build_meta_url(): string
+	{
+		return $this->settings['service_settings']['url'] . self::API_PATH . '/meta/tables/' . $this->settings['service_settings']['table_id'];
+	}
+
+	/**
 	 * Build the link URL.
 	 *
 	 * @since 1.0.0
 	 */
 	private function build_link_url( $main_site_record ): string
 	{
-		return $this->settings['service_settings']['url'] . self::API_PATH . $this->settings['service_settings']['table_id'] . '/links/c34hr5itch1tmey/records/' . json_decode( $main_site_record )->Id;
+		$links_column_id = get_option( OptionHelper::get_links_column_id() );
+
+		return $this->settings['service_settings']['url'] . self::API_PATH . '/tables/' . $this->settings['service_settings']['table_id'] . '/links/' . $links_column_id . '/records/' . json_decode( $main_site_record )->Id;
 	}
 
 	/**
