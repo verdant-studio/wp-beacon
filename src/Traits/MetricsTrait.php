@@ -96,19 +96,20 @@ trait MetricsTrait
 	 */
 	public function get_amount_of_plugin_updates(): int
 	{
-		if ( ! function_exists( 'wp_update_plugins' )) {
-			require_once ABSPATH . WPINC . '/update.php';
-		}
-
-		wp_update_plugins();
 		$update_plugins = get_site_transient( 'update_plugins' );
+
+		if ( ! $update_plugins ) {
+			if ( ! function_exists( 'wp_update_plugins' )) {
+				require_once ABSPATH . WPINC . '/update.php';
+			}
+			wp_update_plugins();
+			$update_plugins = get_site_transient( 'update_plugins' );
+		}
 
 		$count_outdated = 0;
 
 		if (isset( $update_plugins->response )) {
-			foreach ($update_plugins->response as $update_plugin) {
-				++$count_outdated;
-			}
+			$count_outdated = count( $update_plugins->response );
 		}
 
 		return $count_outdated;
