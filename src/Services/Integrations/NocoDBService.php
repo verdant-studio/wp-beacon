@@ -29,7 +29,7 @@ class NocoDBService extends IntegrationService
 {
 	use MetricsTrait;
 
-	private const API_PATH     = '/v0';
+	private const API_PATH     = '/api/v2/tables/';
 	private const CONTENT_TYPE = 'application/json';
 
 	/**
