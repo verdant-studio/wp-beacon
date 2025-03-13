@@ -29,7 +29,7 @@ class NocoDBService extends IntegrationService
 {
 	use MetricsTrait;
 
-	private const API_PATH     = '/api/v2/tables/';
+	private const API_PATH     = '/v0';
 	private const CONTENT_TYPE = 'application/json';
 
 	/**
@@ -60,26 +60,6 @@ class NocoDBService extends IntegrationService
 		return defined( 'WP_BEACON_SERVICE' ) && defined( 'WP_BEACON_SCHEDULE' ) &&
 			defined( 'WP_BEACON_NOCODB_URL' ) && defined( 'WP_BEACON_NOCODB_TABLE_ID' ) &&
 			defined( 'WP_BEACON_NOCODB_XC_TOKEN' );
-	}
-
-	/**
-	 * Sync.
-	 *
-	 * @since 1.0.0
-	 */
-	public function sync(): void
-	{
-		if (is_multisite()) {
-			$sites = get_sites();
-
-			foreach ($sites as $site) {
-				switch_to_blog( $site->blog_id );
-				$this->sync_single_site();
-				restore_current_blog();
-			}
-		} else {
-			$this->sync_single_site();
-		}
 	}
 
 	/**
@@ -337,7 +317,7 @@ class NocoDBService extends IntegrationService
 	 */
 	private function build_link_url( $main_site_record ): string
 	{
-		return $this->settings['service_settings']['url'] . self::API_PATH . $this->settings['service_settings']['table_id'] . '/links/c34hr5itch1tmey/records/' . json_decode( $main_site_record )->Id;
+		return $this->settings['service_settings']['url'] . self::API_PATH . $this->settings['service_settings']['table_id'] . '/links/mbasvc0x6e6kfq9/records/' . json_decode( $main_site_record )->Id;
 	}
 
 	/**

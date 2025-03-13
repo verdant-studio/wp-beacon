@@ -59,6 +59,26 @@ abstract class IntegrationService
 	abstract protected function is_config_set(): bool;
 
 	/**
+	 * Sync.
+	 *
+	 * @since 1.0.0
+	 */
+	public function sync(): void
+	{
+		if (is_multisite()) {
+			$sites = get_sites();
+
+			foreach ($sites as $site) {
+				switch_to_blog( $site->blog_id );
+				$this->sync_single_site();
+				restore_current_blog();
+			}
+		} else {
+			$this->sync_single_site();
+		}
+	}
+
+	/**
 	 * Check if the schedule has changed.
 	 *
 	 * @since 1.0.0
