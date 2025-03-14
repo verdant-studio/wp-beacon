@@ -56,7 +56,14 @@ abstract class IntegrationService
 	 *
 	 * @since 1.0.0
 	 */
-	abstract protected function is_config_set(): bool;
+	abstract public function is_config_set(): bool;
+
+	/**
+	 * Sync a single site.
+	 *
+	 * @since 1.0.0
+	 */
+	abstract protected function sync_single_site();
 
 	/**
 	 * Sync.

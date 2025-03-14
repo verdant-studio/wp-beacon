@@ -28,11 +28,15 @@ use WPBeacon\Services\Integrations\NocoDBService;
  */
 class EventService extends Service
 {
+	private AirtableService $airtable_service;
 	private NocoDBService $noco_db_service;
 
-	public function __construct( NocoDBService $noco_db_service )
-	{
-		$this->noco_db_service = $noco_db_service;
+	public function __construct(
+		AirtableService $airtable_service,
+		NocoDBService $noco_db_service
+	) {
+		$this->airtable_service = $airtable_service;
+		$this->noco_db_service  = $noco_db_service;
 	}
 
 	/**
@@ -77,7 +81,7 @@ class EventService extends Service
 		if ($service) {
 			switch ($service) {
 				case 'airtable':
-					AirtableService::sync();
+					$this->airtable_service->sync();
 					break;
 				case 'nocodb':
 					$this->noco_db_service->sync();

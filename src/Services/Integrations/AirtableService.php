@@ -68,7 +68,7 @@ class AirtableService extends IntegrationService
 	 *
 	 * @since 1.0.0
 	 */
-	public function sync_single_site()
+	protected function sync_single_site()
 	{
 		if ( ! $this->has_valid_settings()) {
 			return new WP_Error(
