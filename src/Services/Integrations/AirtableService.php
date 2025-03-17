@@ -29,7 +29,7 @@ class AirtableService extends IntegrationService
 {
 	use MetricsTrait;
 
-	private const API_PATH     = '/api/v0/';
+	private const API_PATH     = '/v0/';
 	private const CONTENT_TYPE = 'application/json';
 
 	/**
@@ -60,7 +60,7 @@ class AirtableService extends IntegrationService
 	{
 		return defined( 'WP_BEACON_SERVICE' ) && defined( 'WP_BEACON_SCHEDULE' ) &&
 			defined( 'WP_BEACON_AIRTABLE_URL' ) && defined( 'WP_BEACON_AIRTABLE_BASE_ID' ) &&
-			defined( 'WP_BEACON_AIRTABLE_TABLE_ID' ) && defined( 'WP_BEACON_NOCODB_API_KEY' );
+			defined( 'WP_BEACON_AIRTABLE_TABLE_ID' ) && defined( 'WP_BEACON_AIRTABLE_API_KEY' );
 	}
 
 	/**
@@ -78,7 +78,14 @@ class AirtableService extends IntegrationService
 		}
 
 		$site_record = get_option( OptionHelper::get_site_option_key() );
-		$record_id   = $site_record ? json_decode( $site_record )->Id : null;
+		$record_id   = null;
+
+		if ($site_record) {
+			$decoded_record = json_decode( $site_record, true );
+			if (isset( $decoded_record['records'][0]['id'] )) {
+				$record_id = $decoded_record['records'][0]['id'];
+			}
+		}
 
 		if ($record_id && $this->record_exists( $record_id )) {
 			return $this->update_record( $record_id );
@@ -133,8 +140,10 @@ class AirtableService extends IntegrationService
 	 */
 	private function create_record()
 	{
-		$response = $this->send_request( 'POST', $this->get_request_body() );
+		$response = $this->send_request( 'POST', $this->get_request_body( 'POST' ) );
 		$result   = $this->handle_response( $response );
+
+		error_log( 'result', print_r( $result, true ) );
 
 		// Only link records if the request was successful and the site is not the main site.
 		if ( ! is_wp_error( $result ) && ! is_main_site()) {
@@ -151,10 +160,8 @@ class AirtableService extends IntegrationService
 	 */
 	private function update_record( $record_id = null )
 	{
-		$body       = $this->get_request_body();
-		$body['Id'] = $record_id;
-
-		$response = $this->send_request( 'PATCH', $body );
+		$body     = $this->get_request_body( 'PATCH' );
+		$response = $this->send_request( 'PATCH', $body, $record_id );
 
 		return $this->handle_response( $response );
 	}
@@ -165,9 +172,13 @@ class AirtableService extends IntegrationService
 	 * @return array|WP_Error
 	 * @since 1.0.0
 	 */
-	private function send_request( string $method, array $body )
+	private function send_request( string $method, array $body, ?string $record_id = '' )
 	{
-		$url = $this->build_url();
+		if ('POST' === $method) {
+			$url = $this->build_url();
+		} else {
+			$url = $this->build_url( $record_id );
+		}
 
 		return wp_remote_post(
 			$url,
@@ -184,15 +195,32 @@ class AirtableService extends IntegrationService
 	 *
 	 * @since 1.0.0
 	 */
-	private function get_request_body(): array
+	private function get_request_body( string $request_type ): array
 	{
-		return array(
+		$health = $this->get_site_health_rating();
+
+		$fields = array(
 			'Site'              => $this->get_site_name(),
 			'URL'               => $this->get_site_url(),
-			'Health'            => $this->get_site_health_rating(),
-			'WP Version'        => $this->get_current_wp_version(),
-			'Updates available' => $this->get_amount_of_plugin_updates(),
+			'Health'            => 0 === $health ? null : (int) $health, // Airtable does not accept a 0 rating value.
+			'WP version'        => $this->get_current_wp_version(),
+			'Updates available' => (int) $this->get_amount_of_plugin_updates(),
 			'Last sync'         => gmdate( 'Y-m-d H:i:s' ),
+			'Network'           => array( 'recnHHJFo4Fw1IuOA' ),
+		);
+
+		if ('POST' === $request_type) {
+			return array(
+				'records' => array(
+					array(
+						'fields' => $fields,
+					),
+				),
+			);
+		}
+
+		return array(
+			'fields' => $fields,
 		);
 	}
 
@@ -206,10 +234,10 @@ class AirtableService extends IntegrationService
 	{
 		if (is_wp_error( $response )) {
 			return new WP_Error(
-				'nocodb_sync_error',
+				'airtable_sync_error',
 				sprintf(
-				// translators: %s: error message.
-					esc_html__( 'NocoDB sync error: %s', 'wp-beacon' ),
+					// translators: %s: error message.
+					esc_html__( 'Airtable sync error: %s', 'wp-beacon' ),
 					$response->get_error_message()
 				)
 			);
@@ -220,10 +248,10 @@ class AirtableService extends IntegrationService
 			return update_option( OptionHelper::get_site_option_key(), wp_remote_retrieve_body( $response ) );
 		} else {
 			return new WP_Error(
-				'nocodb_sync_error',
+				'airtable_sync_error',
 				sprintf(
-				// translators: %1$d: response code, %2$s: response body.
-					esc_html__( 'NocoDB sync error: HTTP %1$d - %2$s', 'wp-beacon' ),
+					// translators: %1$d: response code, %2$s: response body.
+					esc_html__( 'Airtable sync error: HTTP %1$d - %2$s', 'wp-beacon' ),
 					$response_code,
 					wp_remote_retrieve_body( $response )
 				)
@@ -236,7 +264,7 @@ class AirtableService extends IntegrationService
 	 *
 	 * @since 1.0.0
 	 */
-	private function build_url( string $record_id = '' ): string
+	private function build_url( ?string $record_id = '' ): string
 	{
 		$url = $this->settings['service_settings']['url'] . self::API_PATH . $this->settings['service_settings']['base_id'] . '/' . $this->settings['service_settings']['table_id'];
 

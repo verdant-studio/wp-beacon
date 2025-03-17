@@ -130,7 +130,18 @@ export function Settings({ wpObject }) {
 
 				</div>
 			</div>
-			{settings.service === 'airtable' && (<Airtable />)}
+			{settings.service === 'airtable' && (
+				<Airtable
+					data={settings.service_settings}
+					disabled={isConfigSet}
+					update={(updatedData) =>
+						setSettings({
+							...settings,
+							service_settings: updatedData,
+						})
+					}
+				/>
+			)}
 			{settings.service === 'nocodb' && (
 				<NocoDB
 					data={settings.service_settings}

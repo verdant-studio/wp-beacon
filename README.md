@@ -11,6 +11,7 @@
 - [x] Set settings via the admin or environment variables
 - [x] Multi-site support
 - [x] Multi-environment support (e.g. dev, staging, production)
+- [ ] WP-CLI commands
 
 ## Requirements
 
