@@ -141,16 +141,8 @@ class AirtableService extends IntegrationService
 	private function create_record()
 	{
 		$response = $this->send_request( 'POST', $this->get_request_body( 'POST' ) );
-		$result   = $this->handle_response( $response );
 
-		error_log( 'result'. print_r( $result, true ) );
-
-		// Only link records if the request was successful and the site is not the main site.
-		if ( ! is_wp_error( $result ) && ! is_main_site()) {
-			$this->link_records();
-		}
-
-		return $result;
+		return $this->handle_response( $response );
 	}
 
 	/**
@@ -164,6 +156,46 @@ class AirtableService extends IntegrationService
 		$response = $this->send_request( 'PATCH', $body, $record_id );
 
 		return $this->handle_response( $response );
+	}
+
+	/**
+	 * Link records.
+	 *
+	 * @return array
+	 * @since 1.0.0
+	 */
+	private function link_records(): array
+	{
+		$main_site_id = get_main_site_id();
+		switch_to_blog($main_site_id);
+		$main_site_record = get_option(OptionHelper::get_site_option_key());
+		$main_site_record_decoded = json_decode($main_site_record, true);
+		restore_current_blog();
+
+		$current_site_record = get_option(OptionHelper::get_site_option_key());
+		$current_site_record_decoded = json_decode($current_site_record, true);
+
+		$record_ids = array();
+
+		if (isset($main_site_record_decoded['records'])) {
+			foreach ($main_site_record_decoded['records'] as $record) {
+				if (isset($record['id'])) {
+					$record_ids[] = $record['id'];
+				}
+			}
+		}
+
+		if (isset($current_site_record_decoded['records'])) {
+			foreach ($current_site_record_decoded['records'] as $record) {
+				if (isset($record['id'])) {
+					$record_ids[] = $record['id'];
+				}
+			}
+		}
+
+		error_log(print_r($record_ids, true));
+
+		return $record_ids;
 	}
 
 	/**
@@ -206,7 +238,7 @@ class AirtableService extends IntegrationService
 			'WP version'        => $this->get_current_wp_version(),
 			'Updates available' => (int) $this->get_amount_of_plugin_updates(),
 			'Last sync'         => gmdate( 'Y-m-d H:i:s' ),
-			'Network'           => array( 'recnHHJFo4Fw1IuOA' ),
+			'Network'           => $this->link_records(),
 		);
 
 		if ('POST' === $request_type) {
