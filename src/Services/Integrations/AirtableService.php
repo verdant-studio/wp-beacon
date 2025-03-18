@@ -143,7 +143,7 @@ class AirtableService extends IntegrationService
 		$response = $this->send_request( 'POST', $this->get_request_body( 'POST' ) );
 		$result   = $this->handle_response( $response );
 
-		error_log( 'result', print_r( $result, true ) );
+		error_log( 'result'. print_r( $result, true ) );
 
 		// Only link records if the request was successful and the site is not the main site.
 		if ( ! is_wp_error( $result ) && ! is_main_site()) {

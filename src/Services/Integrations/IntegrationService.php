@@ -94,11 +94,11 @@ abstract class IntegrationService
 	{
 		if ($this->is_config_set()) {
 			$last_schedule = get_transient( 'wp_beacon_last_schedule' );
-			return $last_schedule !== $this->settings['schedule'];
+			return is_array($this->settings) && $last_schedule !== $this->settings['schedule'];
 		}
 
 		$current_settings = get_option( OptionHelper::get_settings_option_key() );
-		return $current_settings['schedule'] !== $this->settings['schedule'];
+		return is_array($current_settings) && $current_settings['schedule'] !== $this->settings['schedule'];
 	}
 
 	/**
