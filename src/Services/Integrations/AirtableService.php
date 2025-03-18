@@ -80,12 +80,16 @@ class AirtableService extends IntegrationService
 		$site_record = get_option( OptionHelper::get_site_option_key() );
 		$record_id   = null;
 
+		error_log('site_record: ' . $site_record);
+
 		if ($site_record) {
 			$decoded_record = json_decode( $site_record, true );
-			if (isset( $decoded_record['records'][0]['id'] )) {
-				$record_id = $decoded_record['records'][0]['id'];
+			if (isset( $decoded_record['id'] )) {
+				$record_id = $decoded_record['id'];
 			}
 		}
+
+		error_log('record_id: ' . $record_id);
 
 		if ($record_id && $this->record_exists( $record_id )) {
 			return $this->update_record( $record_id );
@@ -177,23 +181,13 @@ class AirtableService extends IntegrationService
 
 		$record_ids = array();
 
-		if (isset($main_site_record_decoded['records'])) {
-			foreach ($main_site_record_decoded['records'] as $record) {
-				if (isset($record['id'])) {
-					$record_ids[] = $record['id'];
-				}
-			}
+		if (isset($main_site_record_decoded['id'])) {
+			$record_ids[] = $main_site_record_decoded['id'];
 		}
 
-		if (isset($current_site_record_decoded['records'])) {
-			foreach ($current_site_record_decoded['records'] as $record) {
-				if (isset($record['id'])) {
-					$record_ids[] = $record['id'];
-				}
-			}
+		if (isset($current_site_record_decoded['id'])) {
+			$record_ids[] = $current_site_record_decoded['id'];
 		}
-
-		error_log(print_r($record_ids, true));
 
 		return $record_ids;
 	}
@@ -240,16 +234,6 @@ class AirtableService extends IntegrationService
 			'Last sync'         => gmdate( 'Y-m-d H:i:s' ),
 			'Network'           => $this->link_records(),
 		);
-
-		if ('POST' === $request_type) {
-			return array(
-				'records' => array(
-					array(
-						'fields' => $fields,
-					),
-				),
-			);
-		}
 
 		return array(
 			'fields' => $fields,
